@@ -21,9 +21,9 @@ from wger.weight.models import WeightEntry
 
 
 class WeightEntrySerializer(serializers.ModelSerializer):
-    '''
+    """
     Weight serializer
-    '''
+    """
 
     class Meta:
         model = WeightEntry

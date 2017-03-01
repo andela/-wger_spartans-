@@ -14,9 +14,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 
-'''
+"""
 This file contains forms used in the application
-'''
+"""
 
 from captcha.fields import ReCaptchaField
 
@@ -99,9 +99,9 @@ class SetForm(ModelForm):
 
 
 class SetFormMobile(ModelForm):
-    '''
+    """
     Don't use the auto completer when accessing the mobile version
-    '''
+    """
     class Meta:
         model = Set
         exclude = ('order', 'exerciseday')
@@ -130,18 +130,18 @@ class SettingForm(ModelForm):
 
 
 class HelperDateForm(Form):
-    '''
+    """
     A helper form used in the workout log view
-    '''
+    """
     date = DateField(input_formats=DATE_FORMATS, widget=Html5DateInput())
 
 
 class WorkoutLogForm(ModelForm):
-    '''
+    """
     Helper form for a WorkoutLog.
 
     These fields are re-defined here only to make them optional
-    '''
+    """
     repetition_unit = ModelChoiceField(queryset=RepetitionUnit.objects.all(),
                                        label=_('Unit'),
                                        required=False)
@@ -163,27 +163,27 @@ class WorkoutLogForm(ModelForm):
 
 
 class HelperWorkoutSessionForm(ModelForm):
-    '''
+    """
     A helper form used in the workout log view
-    '''
+    """
     class Meta:
         model = WorkoutSession
         exclude = ('user', 'workout', 'date')
 
 
 class WorkoutSessionForm(ModelForm):
-    '''
+    """
     Workout Session form
-    '''
+    """
     class Meta:
         model = WorkoutSession
         exclude = ('user', 'workout', 'date')
 
 
 class WorkoutSessionHiddenFieldsForm(ModelForm):
-    '''
+    """
     Workout Session form used in the timer view
-    '''
+    """
     class Meta:
         model = WorkoutSession
         exclude = []

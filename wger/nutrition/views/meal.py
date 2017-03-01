@@ -34,9 +34,9 @@ logger = logging.getLogger(__name__)
 # ************************
 
 class MealCreateView(WgerFormMixin, CreateView):
-    '''
+    """
     Generic view to add a new meal to a nutrition plan
-    '''
+    """
 
     model = Meal
     fields = '__all__'
@@ -62,9 +62,9 @@ class MealCreateView(WgerFormMixin, CreateView):
 
 
 class MealEditView(WgerFormMixin, UpdateView):
-    '''
+    """
     Generic view to update an existing meal
-    '''
+    """
 
     model = Meal
     fields = '__all__'
@@ -77,9 +77,9 @@ class MealEditView(WgerFormMixin, UpdateView):
 
 @login_required
 def delete_meal(request, id):
-    '''
+    """
     Deletes the meal with the given ID
-    '''
+    """
 
     # Load the meal
     meal = get_object_or_404(Meal, pk=id)

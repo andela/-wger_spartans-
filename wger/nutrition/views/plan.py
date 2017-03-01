@@ -72,9 +72,9 @@ def overview(request):
 
 @login_required
 def add(request):
-    '''
+    """
     Add a new nutrition plan and redirect to its page
-    '''
+    """
 
     plan = NutritionPlan()
     plan.user = request.user
@@ -85,9 +85,9 @@ def add(request):
 
 
 class PlanDeleteView(WgerDeleteMixin, DeleteView):
-    '''
+    """
     Generic view to delete a nutritional plan
-    '''
+    """
 
     model = NutritionPlan
     fields = ('description', 'has_goal_calories')
@@ -96,36 +96,36 @@ class PlanDeleteView(WgerDeleteMixin, DeleteView):
     messages = ugettext_lazy('Successfully deleted')
 
     def get_context_data(self, **kwargs):
-        '''
+        """
         Send some additional data to the template
-        '''
+        """
         context = super(PlanDeleteView, self).get_context_data(**kwargs)
         context['title'] = _(u'Delete {0}?').format(self.object)
         return context
 
 
 class PlanEditView(WgerFormMixin, UpdateView):
-    '''
+    """
     Generic view to update an existing nutritional plan
-    '''
+    """
 
     model = NutritionPlan
     fields = ('description', 'has_goal_calories')
     form_action_urlname = 'nutrition:plan:edit'
 
     def get_context_data(self, **kwargs):
-        '''
+        """
         Send some additional data to the template
-        '''
+        """
         context = super(PlanEditView, self).get_context_data(**kwargs)
         context['title'] = _(u'Edit {0}').format(self.object)
         return context
 
 
 def view(request, id):
-    '''
+    """
     Show the nutrition plan with the given ID
-    '''
+    """
     template_data = {}
 
     plan = get_object_or_404(NutritionPlan, pk=id)
@@ -163,9 +163,9 @@ def view(request, id):
 
 @login_required
 def copy(request, pk):
-    '''
+    """
     Copy the nutrition plan
-    '''
+    """
 
     plan = get_object_or_404(NutritionPlan, pk=pk, user=request.user)
 
@@ -197,13 +197,13 @@ def copy(request, pk):
 
 
 def export_pdf(request, id, uidb64=None, token=None):
-    '''
+    """
     Generates a PDF with the contents of a nutrition plan
 
     See also
     * http://www.blog.pythonlibrary.org/2010/09/21/reportlab
     * http://www.reportlab.com/apis/reportlab/dev/platypus.html
-    '''
+    """
 
     # Load the plan
     if uidb64 is not None and token is not None:
@@ -314,50 +314,41 @@ def export_pdf(request, id, uidb64=None, token=None):
     elements.append(Paragraph('<para>&nbsp;</para>', styleSheet["Normal"]))
 
     # Create table with nutritional calculations
-    data = []
-    data.append([Paragraph(u'<para align="center">{0}</para>'.format(_('Nutritional data')),
-                 styleSheet["Bold"])])
-    data.append([Paragraph(_('Macronutrients'), styleSheet["Normal"]),
-                 Paragraph(_('Total'), styleSheet["Normal"]),
-                 Paragraph(_('Percent of energy'), styleSheet["Normal"]),
-                 Paragraph(_('g per body kg'), styleSheet["Normal"])])
-    data.append([Paragraph(_('Energy'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['energy']), styleSheet["Normal"])])
-    data.append([Paragraph(_('Protein'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['protein']), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['percent']['protein']), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['per_kg']['protein']), styleSheet["Normal"])])
-    data.append([Paragraph(_('Carbohydrates'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['carbohydrates']),
-                           styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['percent']['carbohydrates']),
-                           styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['per_kg']['carbohydrates']),
-                           styleSheet["Normal"])])
-    data.append([Paragraph(_('Sugar content in carbohydrates'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['carbohydrates_sugar']),
-                           styleSheet["Normal"])])
-    data.append([Paragraph(_('Fat'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['fat']), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['percent']['fat']), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['per_kg']['fat']), styleSheet["Normal"])])
-    data.append([Paragraph(_('Saturated fat content in fats'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['fat_saturated']),
-                           styleSheet["Normal"])])
-    data.append([Paragraph(_('Fibres'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['fibres']), styleSheet["Normal"])])
-    data.append([Paragraph(_('Sodium'), styleSheet["Normal"]),
-                 Paragraph(six.text_type(plan_data['total']['sodium']), styleSheet["Normal"])])
+    data = [[Paragraph(u'<para align="center">{0}</para>'.format(_('Nutritional data')),
+                       styleSheet["Bold"])], [Paragraph(_('Macronutrients'), styleSheet["Normal"]),
+                                              Paragraph(_('Total'), styleSheet["Normal"]),
+                                              Paragraph(_('Percent of energy'), styleSheet["Normal"]),
+                                              Paragraph(_('g per body kg'), styleSheet["Normal"])],
+            [Paragraph(_('Energy'), styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['total']['energy']), styleSheet["Normal"])],
+            [Paragraph(_('Protein'), styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['total']['protein']), styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['percent']['protein']), styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['per_kg']['protein']), styleSheet["Normal"])],
+            [Paragraph(_('Carbohydrates'), styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['total']['carbohydrates']),
+                       styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['percent']['carbohydrates']),
+                       styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['per_kg']['carbohydrates']),
+                       styleSheet["Normal"])], [Paragraph(_('Sugar content in carbohydrates'), styleSheet["Normal"]),
+                                                Paragraph(six.text_type(plan_data['total']['carbohydrates_sugar']),
+                                                          styleSheet["Normal"])],
+            [Paragraph(_('Fat'), styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['total']['fat']), styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['percent']['fat']), styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['per_kg']['fat']), styleSheet["Normal"])],
+            [Paragraph(_('Saturated fat content in fats'), styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['total']['fat_saturated']),
+                       styleSheet["Normal"])], [Paragraph(_('Fibres'), styleSheet["Normal"]),
+                                                Paragraph(six.text_type(plan_data['total']['fibres']),
+                                                          styleSheet["Normal"])],
+            [Paragraph(_('Sodium'), styleSheet["Normal"]),
+             Paragraph(six.text_type(plan_data['total']['sodium']), styleSheet["Normal"])]]
 
-    table_style = []
-    table_style.append(('BOX', (0, 0), (-1, -1), 1.25, colors.black))
-    table_style.append(('GRID', (0, 0), (-1, -1), 0.40, colors.black))
-    table_style.append(('SPAN', (0, 0), (-1, 0)))  # Title
-    table_style.append(('SPAN', (1, 2), (-1, 2)))  # Energy
-    table_style.append(('SPAN', (1, 5), (-1, 5)))  # Sugar
-    table_style.append(('SPAN', (1, 7), (-1, 7)))  # Saturated fats
-    table_style.append(('SPAN', (1, 8), (-1, 8)))  # Fibres
-    table_style.append(('SPAN', (1, 9), (-1, 9)))  # Sodium
+    table_style = [('BOX', (0, 0), (-1, -1), 1.25, colors.black), ('GRID', (0, 0), (-1, -1), 0.40, colors.black),
+                   ('SPAN', (0, 0), (-1, 0)), ('SPAN', (1, 2), (-1, 2)), ('SPAN', (1, 5), (-1, 5)),
+                   ('SPAN', (1, 7), (-1, 7)), ('SPAN', (1, 8), (-1, 8)), ('SPAN', (1, 9), (-1, 9))]
     t = Table(data, style=table_style)
     t._argW[0] = 5 * cm
     elements.append(t)

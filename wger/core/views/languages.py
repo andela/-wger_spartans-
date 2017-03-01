@@ -40,9 +40,9 @@ logger = logging.getLogger(__name__)
 
 
 class LanguageListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
-    '''
+    """
     Show an overview of all languages
-    '''
+    """
     model = Language
     template_name = 'language/overview.html'
     context_object_name = 'language_list'
@@ -57,9 +57,9 @@ class LanguageDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView
 
 
 class LanguageCreateView(WgerFormMixin, LoginRequiredMixin, PermissionRequiredMixin, CreateView):
-    '''
+    """
     Generic view to add a new language
-    '''
+    """
 
     model = Language
     fields = '__all__'
@@ -69,9 +69,9 @@ class LanguageCreateView(WgerFormMixin, LoginRequiredMixin, PermissionRequiredMi
 
 
 class LanguageDeleteView(WgerDeleteMixin, LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
-    '''
+    """
     Generic view to delete an existing language
-    '''
+    """
 
     model = Language
     fields = '__all__'
@@ -80,9 +80,9 @@ class LanguageDeleteView(WgerDeleteMixin, LoginRequiredMixin, PermissionRequired
     permission_required = 'core.delete_language'
 
     def get_context_data(self, **kwargs):
-        '''
+        """
         Send some additional data to the template
-        '''
+        """
         context = super(LanguageDeleteView, self).get_context_data(**kwargs)
 
         context['title'] = _(u'Delete {0}?').format(self.object.full_name)
@@ -92,9 +92,9 @@ class LanguageDeleteView(WgerDeleteMixin, LoginRequiredMixin, PermissionRequired
 
 
 class LanguageEditView(WgerFormMixin, LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
-    '''
+    """
     Generic view to update an existing language
-    '''
+    """
 
     model = Language
     fields = '__all__'
@@ -102,9 +102,9 @@ class LanguageEditView(WgerFormMixin, LoginRequiredMixin, PermissionRequiredMixi
     permission_required = 'core.change_language'
 
     def get_context_data(self, **kwargs):
-        '''
+        """
         Send some additional data to the template
-        '''
+        """
         context = super(LanguageEditView, self).get_context_data(**kwargs)
         context['title'] = _(u'Edit {0}').format(self.object.full_name)
         return context

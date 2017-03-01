@@ -1,3 +1,6 @@
+funkload
+captcha
+captcha
 #
 # Requirements for wger for production
 #

@@ -452,7 +452,7 @@ if hasattr(args, 'number_nutrition_plans'):
 
     # Total meals per plan
     total_meals = 4
-    
+
     for user in userlist:
         print('   - generating for {0}'.format(user.username))
 
@@ -475,4 +475,4 @@ if hasattr(args, 'number_nutrition_plans'):
                     ingredient = random.choice(ingredientList)
                     meal_item = MealItem(meal=meal, ingredient=ingredient, weight_unit=None, order=order, amount=random.randint(10, 250))
                     meal_item.save()
-                order = order + 1
+                order += 1
