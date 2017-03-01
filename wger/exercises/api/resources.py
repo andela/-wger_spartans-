@@ -118,6 +118,7 @@ class ExerciseCommentResource(ModelResource):
 
 
 class MuscleResource(ModelResource):
+
     class Meta:
         queryset = Muscle.objects.all()
         filtering = {'id': ALL,

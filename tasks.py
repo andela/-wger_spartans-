@@ -135,7 +135,8 @@ def create_settings(context, settings_path=None, database_path=None, url=None, d
         url = 'http://localhost:8000'
 
     # Fill in the config file template
-    settings_template = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wger', 'settings.tpl')
+    settings_template = os.path.join(os.path.dirname(
+        os.path.abspath(__file__)), 'wger', 'settings.tpl')
     with open(settings_template, 'r') as settings_file:
         settings_content = settings_file.read()
 
@@ -226,7 +227,6 @@ def load_fixtures(context, settings_path=None):
 
     # Find the path to the settings and setup the django environment
     setup_django_environment(settings_path)
-
 
     # os.chdir(os.path.dirname(inspect.stack()[0][1]))
     # current_dir = os.path.join(os.getcwd(), 'wger')
