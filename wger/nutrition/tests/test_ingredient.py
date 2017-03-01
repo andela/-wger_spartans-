@@ -277,6 +277,7 @@ class IngredientValuesTestCase(WorkoutManagerTestCase):
 class IngredientTestCase(WorkoutManagerTestCase):
     """
     Tests other ingredient functions
+
     """
     def test_compare(self):
         """

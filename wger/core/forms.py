@@ -40,6 +40,7 @@ class UserLoginForm(AuthenticationForm):
 
 
 class UserPreferencesForm(forms.ModelForm):
+
     class Meta:
         model = UserProfile
         fields = ('show_comments',

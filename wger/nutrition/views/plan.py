@@ -314,6 +314,7 @@ def export_pdf(request, id, uidb64=None, token=None):
     elements.append(Paragraph('<para>&nbsp;</para>', styleSheet["Normal"]))
 
     # Create table with nutritional calculations
+
     data = [[Paragraph(u'<para align="center">{0}</para>'.format(_('Nutritional data')),
                        styleSheet["Bold"])], [Paragraph(_('Macronutrients'), styleSheet["Normal"]),
                                               Paragraph(_('Total'), styleSheet["Normal"]),
@@ -349,6 +350,7 @@ def export_pdf(request, id, uidb64=None, token=None):
     table_style = [('BOX', (0, 0), (-1, -1), 1.25, colors.black), ('GRID', (0, 0), (-1, -1), 0.40, colors.black),
                    ('SPAN', (0, 0), (-1, 0)), ('SPAN', (1, 2), (-1, 2)), ('SPAN', (1, 5), (-1, 5)),
                    ('SPAN', (1, 7), (-1, 7)), ('SPAN', (1, 8), (-1, 8)), ('SPAN', (1, 9), (-1, 9))]
+
     t = Table(data, style=table_style)
     t._argW[0] = 5 * cm
     elements.append(t)

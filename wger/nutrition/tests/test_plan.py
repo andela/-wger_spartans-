@@ -126,6 +126,7 @@ class EditPlanTestCase(WorkoutManagerEditTestCase):
 class PlanDailyCaloriesTestCase(WorkoutManagerTestCase):
     """
     Tests the handling of the daily calories in the plan page
+
     """
     def test_overview_no_calories(self):
         """

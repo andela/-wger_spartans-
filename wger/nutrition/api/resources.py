@@ -57,6 +57,7 @@ class IngredientResource(ModelResource):
 
 
 class WeightUnitResource(ModelResource):
+
     class Meta:
         queryset = WeightUnit.objects.all()
         filtering = {'id': ALL,

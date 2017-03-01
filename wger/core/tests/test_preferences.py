@@ -194,6 +194,7 @@ class UserBodyweightTestCase(WorkoutManagerTestCase):
 class PreferencesCalculationsTestCase(WorkoutManagerTestCase):
     """
     Tests the different calculation method in the user profile
+
     """
     def test_last_weight_entry(self):
         """

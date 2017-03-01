@@ -98,6 +98,7 @@ class ApiBaseTestCase(APITestCase):
 class ApiGetTestCase(object):
     """
     Base test case for testing GET access to the API
+
     """
     def test_ordering(self):
         """

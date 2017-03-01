@@ -140,6 +140,7 @@ def dashboard(request):
 
 
 class ContactClassView(TemplateView):
+
     def get_context_data(self, **kwargs):
         context = super(ContactClassView, self).get_context_data(**kwargs)
         context.update({'contribute': reverse('software:contribute'),

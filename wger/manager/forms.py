@@ -65,6 +65,7 @@ class DemoUserForm(Form):
 
 
 class WorkoutForm(ModelForm):
+
     class Meta:
         model = Workout
         exclude = ('user',)
@@ -77,6 +78,7 @@ class WorkoutCopyForm(Form):
 
 
 class DayForm(ModelForm):
+
     class Meta:
         model = Day
         exclude = ('training',)
@@ -84,6 +86,7 @@ class DayForm(ModelForm):
 
 
 class SetForm(ModelForm):
+
     class Meta:
         model = Set
         exclude = ('order', 'exerciseday')
@@ -124,6 +127,7 @@ class SetFormMobile(ModelForm):
 
 
 class SettingForm(ModelForm):
+
     class Meta:
         model = Setting
         exclude = ('set', 'exercise', 'order', 'comment')

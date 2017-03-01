@@ -201,13 +201,13 @@ def process_log_entries(logs):
 
 
 def get_last_entries(user, amount=5):
+
     """
     Get the last weight entries as well as the difference to the last
 
     This can be used e.g. to present a list where the last entries and
     their changes are presented.
      """
-
     last_entries = WeightEntry.objects.filter(user=user).order_by('-date')[:5]
     last_entries_details = []
 
