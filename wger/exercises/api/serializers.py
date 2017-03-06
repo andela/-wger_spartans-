@@ -26,48 +26,48 @@ from wger.exercises.models import (
 
 
 class ExerciseSerializer(serializers.ModelSerializer):
-    '''
+    """
     Exercise serializer
-    '''
+    """
     class Meta:
         model = Exercise
 
 
 class EquipmentSerializer(serializers.ModelSerializer):
-    '''
+    """
     Equipment serializer
-    '''
+    """
     class Meta:
         model = Equipment
 
 
 class ExerciseCategorySerializer(serializers.ModelSerializer):
-    '''
+    """
     ExerciseCategory serializer
-    '''
+    """
     class Meta:
         model = ExerciseCategory
 
 
 class ExerciseImageSerializer(serializers.ModelSerializer):
-    '''
+    """
     ExerciseImage serializer
-    '''
+    """
     class Meta:
         model = ExerciseImage
 
 
 class ExerciseCommentSerializer(serializers.ModelSerializer):
-    '''
+    """
     ExerciseComment serializer
-    '''
+    """
     class Meta:
         model = ExerciseComment
 
 
 class MuscleSerializer(serializers.ModelSerializer):
-    '''
+    """
     Muscle serializer
-    '''
+    """
     class Meta:
         model = Muscle

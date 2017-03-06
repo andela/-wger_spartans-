@@ -20,6 +20,7 @@ from wger.exercises.models import ExerciseImage, ExerciseComment
 
 
 class ExerciseImageForm(forms.ModelForm):
+
     class Meta:
         model = ExerciseImage
         fields = ('image',
@@ -29,6 +30,7 @@ class ExerciseImageForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
+
     class Meta:
         model = ExerciseComment
         exclude = ('exercise',)

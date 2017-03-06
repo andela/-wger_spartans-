@@ -24,9 +24,9 @@ from wger.manager.models import Workout
 
 
 class WorkoutShareButtonTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Test that the share button is correctly displayed and hidden
-    '''
+    """
 
     def test_share_button(self):
         workout = Workout.objects.get(pk=1)
@@ -44,14 +44,14 @@ class WorkoutShareButtonTestCase(WorkoutManagerTestCase):
 
 
 class WorkoutAccessTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Test accessing the workout page
-    '''
+    """
 
     def test_access_shared(self):
-        '''
+        """
         Test accessing the URL of a shared workout
-        '''
+        """
         workout = Workout.objects.get(pk=1)
 
         self.user_login('admin')
@@ -67,9 +67,9 @@ class WorkoutAccessTestCase(WorkoutManagerTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_access_not_shared(self):
-        '''
+        """
         Test accessing the URL of a private workout
-        '''
+        """
         workout = Workout.objects.get(pk=3)
 
         self.user_login('admin')
@@ -86,14 +86,14 @@ class WorkoutAccessTestCase(WorkoutManagerTestCase):
 
 
 class AddWorkoutTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Tests adding a Workout
-    '''
+    """
 
     def create_workout(self):
-        '''
+        """
         Helper function to test creating workouts
-        '''
+        """
 
         # Create a workout
         count_before = Workout.objects.count()
@@ -114,9 +114,9 @@ class AddWorkoutTestCase(WorkoutManagerTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_create_workout_logged_in(self):
-        '''
+        """
         Test creating a workout a logged in user
-        '''
+        """
 
         self.user_login()
         self.create_workout()
@@ -124,9 +124,9 @@ class AddWorkoutTestCase(WorkoutManagerTestCase):
 
 
 class DeleteTestWorkoutTestCase(WorkoutManagerDeleteTestCase):
-    '''
+    """
     Tests deleting a Workout
-    '''
+    """
 
     object_class = Workout
     url = 'manager:workout:delete'
@@ -136,9 +136,9 @@ class DeleteTestWorkoutTestCase(WorkoutManagerDeleteTestCase):
 
 
 class EditWorkoutTestCase(WorkoutManagerEditTestCase):
-    '''
+    """
     Tests editing a Workout
-    '''
+    """
 
     object_class = Workout
     url = 'manager:workout:edit'
@@ -149,14 +149,14 @@ class EditWorkoutTestCase(WorkoutManagerEditTestCase):
 
 
 class WorkoutOverviewTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Tests the workout overview
-    '''
+    """
 
     def get_workout_overview(self):
-        '''
+        """
         Helper function to test the workout overview
-        '''
+        """
 
         response = self.client.get(reverse('manager:workout:overview'))
 
@@ -165,22 +165,22 @@ class WorkoutOverviewTestCase(WorkoutManagerTestCase):
         self.assertEqual(len(response.context['workouts']), 2)
 
     def test_dashboard_logged_in(self):
-        '''
+        """
         Test creating a workout a logged in user
-        '''
+        """
         self.user_login()
         self.get_workout_overview()
 
 
 class WorkoutModelTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Tests other functionality from the model
-    '''
+    """
 
     def test_unicode(self):
-        '''
+        """
         Test the unicode representation
-        '''
+        """
 
         workout = Workout()
         workout.creation_date = datetime.date.today()
@@ -192,9 +192,9 @@ class WorkoutModelTestCase(WorkoutManagerTestCase):
 
 
 class WorkoutApiTestCase(api_base_test.ApiBaseResourceTestCase):
-    '''
+    """
     Tests the workout overview resource
-    '''
+    """
     pk = 3
     resource = Workout
     private_resource = True

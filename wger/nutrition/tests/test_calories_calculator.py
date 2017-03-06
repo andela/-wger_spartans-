@@ -25,14 +25,14 @@ from wger.weight.models import WeightEntry
 
 
 class CaloriesCalculatorTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Tests the calories calculator methods and views
-    '''
+    """
 
     def test_page(self):
-        '''
+        """
         Access the page
-        '''
+        """
 
         response = self.client.get(reverse('nutrition:calories:view'))
         self.assertEqual(response.status_code, 302)
@@ -42,9 +42,9 @@ class CaloriesCalculatorTestCase(WorkoutManagerTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_calculator(self):
-        '''
+        """
         Tests the calculator itself
-        '''
+        """
 
         self.user_login('test')
         response = self.client.post(reverse('nutrition:calories:activities'),
@@ -62,9 +62,9 @@ class CaloriesCalculatorTestCase(WorkoutManagerTestCase):
         self.assertEqual(decimal.Decimal(result['activities']), decimal.Decimal(2920))
 
     def test_automatic_weight_entry_bmi(self):
-        '''
+        """
         Tests that weight entries are automatically created or updated
-        '''
+        """
 
         self.user_login('test')
         user = User.objects.get(username=self.current_user)
@@ -102,9 +102,9 @@ class CaloriesCalculatorTestCase(WorkoutManagerTestCase):
         self.assertEqual(entry.date, datetime.date.today())
 
     def test_bmr(self):
-        '''
+        """
         Tests the BMR view
-        '''
+        """
 
         self.user_login('test')
         response = self.client.post(reverse('nutrition:calories:bmr'),
@@ -117,9 +117,9 @@ class CaloriesCalculatorTestCase(WorkoutManagerTestCase):
         self.assertEqual(result, {'bmr': '1780'})
 
     def test_automatic_weight_entry_bmr(self):
-        '''
+        """
         Tests that weight entries are automatically created or updated
-        '''
+        """
 
         self.user_login('test')
         user = User.objects.get(username=self.current_user)

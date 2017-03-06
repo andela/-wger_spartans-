@@ -33,9 +33,9 @@ Tests for workout sessions
 
 
 class AddWorkoutSessionTestCase(WorkoutManagerAddTestCase):
-    '''
+    """
     Tests adding a workout session
-    '''
+    """
 
     object_class = WorkoutSession
     url = reverse_lazy('manager:session:add', kwargs={'workout_pk': 1,
@@ -54,9 +54,9 @@ class AddWorkoutSessionTestCase(WorkoutManagerAddTestCase):
 
 
 class EditWorkoutSessionTestCase(WorkoutManagerEditTestCase):
-    '''
+    """
     Tests editing a workout session
-    '''
+    """
 
     object_class = WorkoutSession
     url = 'manager:session:edit'
@@ -73,14 +73,14 @@ class EditWorkoutSessionTestCase(WorkoutManagerEditTestCase):
 
 
 class WorkoutSessionModelTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Tests other functionality from the model
-    '''
+    """
 
     def test_unicode(self):
-        '''
+        """
         Test the unicode representation
-        '''
+        """
 
         session = WorkoutSession()
         session.workout = Workout.objects.get(pk=1)
@@ -90,9 +90,9 @@ class WorkoutSessionModelTestCase(WorkoutManagerTestCase):
 
 
 class DeleteTestWorkoutTestCase(WorkoutManagerDeleteTestCase):
-    '''
+    """
     Tests deleting a Workout
-    '''
+    """
 
     object_class = WorkoutSession
     url = 'manager:session:delete'
@@ -100,9 +100,9 @@ class DeleteTestWorkoutTestCase(WorkoutManagerDeleteTestCase):
 
 
 class WorkoutSessionDeleteLogsTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Tests that deleting a session can also delete all weight logs
-    '''
+    """
 
     def test_delete_logs(self):
         self.user_login('admin')
@@ -121,14 +121,14 @@ class WorkoutSessionDeleteLogsTestCase(WorkoutManagerTestCase):
 
 
 class WorkoutSessionTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Tests other workout session methods
-    '''
+    """
 
     def test_model_validation(self):
-        '''
+        """
         Tests the custom clean() method
-        '''
+        """
         self.user_login('admin')
 
         # Values OK
@@ -164,14 +164,14 @@ class WorkoutSessionTestCase(WorkoutManagerTestCase):
 
 
 class WorkoutLogCacheTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Workout log cache test case
-    '''
+    """
 
     def test_cache_update_session(self):
-        '''
+        """
         Test that the caches are cleared when updating a workout session
-        '''
+        """
         log_hash = hash((1, 2012, 10))
         self.user_login('admin')
         self.client.get(reverse('manager:workout:calendar', kwargs={'year': 2012, 'month': 10}))
@@ -183,9 +183,9 @@ class WorkoutLogCacheTestCase(WorkoutManagerTestCase):
         self.assertFalse(cache.get(cache_mapper.get_workout_log_list(log_hash)))
 
     def test_cache_update_session_2(self):
-        '''
+        """
         Test that the caches are only cleared for a the session's month
-        '''
+        """
         log_hash = hash((1, 2012, 10))
         self.user_login('admin')
         self.client.get(reverse('manager:workout:calendar', kwargs={'year': 2012, 'month': 10}))
@@ -198,9 +198,9 @@ class WorkoutLogCacheTestCase(WorkoutManagerTestCase):
         self.assertTrue(cache.get(cache_mapper.get_workout_log_list(log_hash)))
 
     def test_cache_delete_session(self):
-        '''
+        """
         Test that the caches are cleared when deleting a workout session
-        '''
+        """
         log_hash = hash((1, 2012, 10))
         self.user_login('admin')
         self.client.get(reverse('manager:workout:calendar', kwargs={'year': 2012, 'month': 10}))
@@ -211,9 +211,9 @@ class WorkoutLogCacheTestCase(WorkoutManagerTestCase):
         self.assertFalse(cache.get(cache_mapper.get_workout_log_list(log_hash)))
 
     def test_cache_delete_session_2(self):
-        '''
+        """
         Test that the caches are only cleared for a the session's month
-        '''
+        """
         log_hash = hash((1, 2012, 10))
         self.user_login('admin')
         self.client.get(reverse('manager:workout:calendar', kwargs={'year': 2012, 'month': 10}))
@@ -225,9 +225,9 @@ class WorkoutLogCacheTestCase(WorkoutManagerTestCase):
 
 
 class WorkoutSessionApiTestCase(api_base_test.ApiBaseResourceTestCase):
-    '''
+    """
     Tests the workout overview resource
-    '''
+    """
     pk = 4
     resource = WorkoutSession
     private_resource = True

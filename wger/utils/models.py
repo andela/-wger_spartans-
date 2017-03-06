@@ -26,9 +26,9 @@ Abstract model classes
 
 
 class AbstractLicenseModel(models.Model):
-    '''
+    """
     Abstract class that adds license information to a model
-    '''
+    """
 
     class Meta:
         abstract = True
@@ -49,13 +49,13 @@ class AbstractLicenseModel(models.Model):
 
 
 class AbstractSubmissionModel(models.Model):
-    '''
+    """
     Abstract class used for model for user submitted data.
 
     These models have to be approved first by an administrator before they are
     shows in the website. There is also a manager that can be used:
     utils.managers.SubmissionManager
-    '''
+    """
 
     class Meta:
         abstract = True

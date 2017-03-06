@@ -35,9 +35,9 @@ from wger.weight.models import WeightEntry
 
 @python_2_unicode_compatible
 class Language(models.Model):
-    '''
+    """
     Language of an item (exercise, workout, etc.)
-    '''
+    """
 
     # e.g. 'de'
     short_name = models.CharField(max_length=2,
@@ -48,33 +48,33 @@ class Language(models.Model):
                                  verbose_name=_('Language full name'))
 
     class Meta:
-        '''
+        """
         Set Meta options
-        '''
+        """
         ordering = ["full_name", ]
 
     #
     # Django methods
     #
     def __str__(self):
-        '''
+        """
         Return a more human-readable representation
-        '''
+        """
         return u"{0} ({1})".format(self.full_name, self.short_name)
 
     def get_absolute_url(self):
-        '''
+        """
         Returns the canonical URL to view a language
-        '''
+        """
         return reverse('core:language:view', kwargs={'pk': self.id})
 
     #
     # Own methods
     #
     def get_owner_object(self):
-        '''
+        """
         Muscle has no owner information
-        '''
+        """
         return False
 
 
@@ -315,10 +315,10 @@ by the US Department of Agriculture. It is extremely complete, with around
 
     @property
     def weight(self):
-        '''
+        """
         Returns the last weight entry, done here to make the behaviour
         more consistent with the other settings (age, height, etc.)
-        '''
+        """
         try:
             weight = WeightEntry.objects.filter(user=self.user).latest().weight
         except WeightEntry.DoesNotExist:
@@ -327,9 +327,9 @@ by the US Department of Agriculture. It is extremely complete, with around
 
     @property
     def address(self):
-        '''
+        """
         Return the address as saved in the current contract (user's gym)
-        '''
+        """
         out = {'zip_code': '',
                'city': '',
                'street': '',
@@ -344,35 +344,35 @@ by the US Department of Agriculture. It is extremely complete, with around
         return out
 
     def clean(self):
-        '''
+        """
         Make sure the total amount of hours is 24
-        '''
+        """
         if ((self.sleep_hours and self.freetime_hours and self.work_hours)
-           and (self.sleep_hours + self.freetime_hours + self.work_hours) > 24):
-                raise ValidationError(_('The sum of all hours has to be 24'))
+                and (self.sleep_hours + self.freetime_hours + self.work_hours) > 24):
+            raise ValidationError(_('The sum of all hours has to be 24'))
 
     def __str__(self):
-        '''
+        """
         Return a more human-readable representation
-        '''
+        """
         return u"Profile for user {0}".format(self.user)
 
     @property
     def use_metric(self):
-        '''
+        """
         Simple helper that checks whether the user uses metric units or not
         :return: Boolean
-        '''
+        """
         return self.weight_unit == 'kg'
 
     def calculate_bmi(self):
-        '''
+        """
         Calculates the user's BMI
 
         Formula: weight/height^2
         - weight in kg
         - height in m
-        '''
+        """
 
         # If not all the data is available, return 0, otherwise the result
         # of the calculation below breaks django's template filters
@@ -384,11 +384,11 @@ by the US Department of Agriculture. It is extremely complete, with around
                          self.height / decimal.Decimal(100.0))
 
     def calculate_basal_metabolic_rate(self, formula=1):
-        '''
+        """
         Calculates the basal metabolic rate.
 
         Currently only the Mifflin-St.Jeor formula is supported
-        '''
+        """
         factor = 5 if self.gender == self.GENDER_MALE else -161
         weight = self.weight if self.use_metric else AbstractWeight(self.weight, 'lb').kg
 
@@ -404,13 +404,13 @@ by the US Department of Agriculture. It is extremely complete, with around
         return decimal.Decimal(str(rate)).quantize(TWOPLACES)
 
     def calculate_activities(self):
-        '''
+        """
         Calculates the calories needed by additional physical activities
 
         Factors taken from
         * https://en.wikipedia.org/wiki/Physical_activity_level
         * http://www.fao.org/docrep/007/y5686e/y5686e07.htm
-        '''
+        """
         # Sleep
         sleep = self.sleep_hours * 0.95
 
@@ -446,9 +446,9 @@ by the US Department of Agriculture. It is extremely complete, with around
         return decimal.Decimal(str(total)).quantize(TWOPLACES)
 
     def user_bodyweight(self, weight):
-        '''
+        """
         Create a new weight entry as needed
-        '''
+        """
         if (not WeightEntry.objects.filter(user=self.user).exists()
             or (datetime.date.today()
                 - WeightEntry.objects.filter(user=self.user).latest().date
@@ -467,17 +467,17 @@ by the US Department of Agriculture. It is extremely complete, with around
         return entry
 
     def get_owner_object(self):
-        '''
+        """
         Returns the object that has owner information
-        '''
+        """
         return self
 
 
 @python_2_unicode_compatible
 class UserCache(models.Model):
-    '''
+    """
     A table used to cache expensive queries or similar
-    '''
+    """
 
     user = models.OneToOneField(User, editable=False)
     '''
@@ -493,41 +493,41 @@ class UserCache(models.Model):
     '''
 
     def __str__(self):
-        '''
+        """
         Return a more human-readable representation
-        '''
+        """
         return u"Cache for user {0}".format(self.user)
 
 
 @python_2_unicode_compatible
 class DaysOfWeek(models.Model):
-    '''
+    """
     Model for the days of the week
 
     This model is needed so that 'Day' can have multiple days of the week selected
-    '''
+    """
 
     day_of_week = models.CharField(max_length=9,
                                    verbose_name=_('Day of the week'))
 
     class Meta:
-        '''
+        """
         Order by day-ID, this is needed for some DBs
-        '''
+        """
         ordering = ["pk", ]
 
     def __str__(self):
-        '''
+        """
         Return a more human-readable representation
-        '''
+        """
         return self.day_of_week
 
 
 @python_2_unicode_compatible
 class License(models.Model):
-    '''
+    """
     License for an item (exercise, ingredient, etc.)
-    '''
+    """
 
     full_name = models.CharField(max_length=60,
                                  verbose_name=_('Full name'),
@@ -547,103 +547,103 @@ class License(models.Model):
     '''URL to full license text or other information'''
 
     class Meta:
-        '''
+        """
         Set Meta options
-        '''
+        """
         ordering = ["full_name", ]
 
     #
     # Django methods
     #
     def __str__(self):
-        '''
+        """
         Return a more human-readable representation
-        '''
+        """
         return u"{0} ({1})".format(self.full_name, self.short_name)
 
     #
     # Own methods
     #
     def get_owner_object(self):
-        '''
+        """
         License has no owner information
-        '''
+        """
         return None
 
 
 @python_2_unicode_compatible
 class RepetitionUnit(models.Model):
-    '''
+    """
     Setting unit, used in combination with an amount such as '10 reps', '5 km'
-    '''
+    """
     class Meta:
-        '''
+        """
         Set Meta options
-        '''
+        """
         ordering = ["name", ]
 
     name = models.CharField(max_length=100,
                             verbose_name=_('Name'))
 
     def __str__(self):
-        '''
+        """
         Return a more human-readable representation
-        '''
+        """
         return self.name
 
     #
     # Own methods
     #
     def get_owner_object(self):
-        '''
+        """
         Unit has no owner information
-        '''
+        """
         return None
 
     @property
     def is_repetition(self):
-        '''
+        """
         Checks that the repetition unit is a repetition proper
 
         This is done basically to not litter the code with magic IDs
-        '''
+        """
         return self.id == 1
 
 
 @python_2_unicode_compatible
 class WeightUnit(models.Model):
-    '''
+    """
     Weight unit, used in combination with an amount such as '10 kg', '5 plates'
-    '''
+    """
     class Meta:
-        '''
+        """
         Set Meta options
-        '''
+        """
         ordering = ["name", ]
 
     name = models.CharField(max_length=100,
                             verbose_name=_('Name'))
 
     def __str__(self):
-        '''
+        """
         Return a more human-readable representation
-        '''
+        """
         return self.name
 
     #
     # Own methods
     #
     def get_owner_object(self):
-        '''
+        """
         Unit has no owner information
-        '''
+        """
         return None
 
     @property
     def is_weight(self):
-        '''
+        """
         Checks that the unit is a weight proper
 
         This is done basically to not litter the code with magic IDs
-        '''
+        """
         return self.id in (1, 2)

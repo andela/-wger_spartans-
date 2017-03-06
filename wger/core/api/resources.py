@@ -28,14 +28,14 @@ from wger.core.models import (
 
 
 class UserProfileResource(ModelResource):
-    '''
+    """
     Resource for user profiles
-    '''
+    """
 
     def authorized_read_list(self, object_list, bundle):
-        '''
+        """
         Filter to own objects
-        '''
+        """
         return object_list.filter(user=bundle.request.user)
 
     class Meta:
@@ -46,9 +46,9 @@ class UserProfileResource(ModelResource):
 
 
 class LanguageResource(ModelResource):
-    '''
+    """
     Resource for languages
-    '''
+    """
     class Meta:
         queryset = Language.objects.all()
         filtering = {'id': ALL,
@@ -57,9 +57,9 @@ class LanguageResource(ModelResource):
 
 
 class DaysOfWeekResource(ModelResource):
-    '''
+    """
     Resource for days of the week
-    '''
+    """
 
     class Meta:
         queryset = DaysOfWeek.objects.all()
@@ -68,9 +68,9 @@ class DaysOfWeekResource(ModelResource):
 
 
 class LicenseResource(ModelResource):
-    '''
+    """
     Resource for licenses
-    '''
+    """
     class Meta:
         queryset = License.objects.all()
         filtering = {'id': ALL,
