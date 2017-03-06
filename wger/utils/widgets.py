@@ -102,7 +102,8 @@ class ExerciseAjaxSelect(SelectMultiple):
         if value is None:
             value = []
 
-        output = [u'<div>', u'<input type="text" id="exercise-search" class="form-control">', u'</div>',
+        output = [u'<div>', u'<input type="text" id="exercise-search" class="form-control">',
+                  u'</div>',
                   '<div id="exercise-search-log">']
 
         options = self.render_options(choices, value)

@@ -130,7 +130,8 @@ class GymConfig(m.Model):
 
     weeks_inactive = m.PositiveIntegerField(verbose_name=_('Reminder of inactive members'),
                                             help_text=_('Number of weeks since the last time a '
-                                                        'user logged his presence to be considered inactive'),
+                                                        'user logged his presence to be considered '
+                                                        'inactive'),
                                             default=4)
     '''
     Reminder of inactive members

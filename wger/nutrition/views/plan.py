@@ -318,7 +318,8 @@ def export_pdf(request, id, uidb64=None, token=None):
     data = [[Paragraph(u'<para align="center">{0}</para>'.format(_('Nutritional data')),
                        styleSheet["Bold"])], [Paragraph(_('Macronutrients'), styleSheet["Normal"]),
                                               Paragraph(_('Total'), styleSheet["Normal"]),
-                                              Paragraph(_('Percent of energy'), styleSheet["Normal"]),
+                                              Paragraph(_('Percent of energy'),
+                                                        styleSheet["Normal"]),
                                               Paragraph(_('g per body kg'), styleSheet["Normal"])],
             [Paragraph(_('Energy'), styleSheet["Normal"]),
              Paragraph(six.text_type(plan_data['total']['energy']), styleSheet["Normal"])],
@@ -332,8 +333,10 @@ def export_pdf(request, id, uidb64=None, token=None):
              Paragraph(six.text_type(plan_data['percent']['carbohydrates']),
                        styleSheet["Normal"]),
              Paragraph(six.text_type(plan_data['per_kg']['carbohydrates']),
-                       styleSheet["Normal"])], [Paragraph(_('Sugar content in carbohydrates'), styleSheet["Normal"]),
-                                                Paragraph(six.text_type(plan_data['total']['carbohydrates_sugar']),
+                       styleSheet["Normal"])], [Paragraph(_('Sugar content in carbohydrates'),
+                                                          styleSheet["Normal"]),
+                                                Paragraph(six.text_type(plan_data['total']
+                                                                        ['carbohydrates_sugar']),
                                                           styleSheet["Normal"])],
             [Paragraph(_('Fat'), styleSheet["Normal"]),
              Paragraph(six.text_type(plan_data['total']['fat']), styleSheet["Normal"]),
@@ -342,12 +345,14 @@ def export_pdf(request, id, uidb64=None, token=None):
             [Paragraph(_('Saturated fat content in fats'), styleSheet["Normal"]),
              Paragraph(six.text_type(plan_data['total']['fat_saturated']),
                        styleSheet["Normal"])], [Paragraph(_('Fibres'), styleSheet["Normal"]),
-                                                Paragraph(six.text_type(plan_data['total']['fibres']),
+                                                Paragraph(six.text_type(plan_data['total']
+                                                                        ['fibres']),
                                                           styleSheet["Normal"])],
             [Paragraph(_('Sodium'), styleSheet["Normal"]),
              Paragraph(six.text_type(plan_data['total']['sodium']), styleSheet["Normal"])]]
 
-    table_style = [('BOX', (0, 0), (-1, -1), 1.25, colors.black), ('GRID', (0, 0), (-1, -1), 0.40, colors.black),
+    table_style = [('BOX', (0, 0), (-1, -1), 1.25, colors.black),
+                   ('GRID', (0, 0), (-1, -1), 0.40, colors.black),
                    ('SPAN', (0, 0), (-1, 0)), ('SPAN', (1, 2), (-1, 2)), ('SPAN', (1, 5), (-1, 5)),
                    ('SPAN', (1, 7), (-1, 7)), ('SPAN', (1, 8), (-1, 8)), ('SPAN', (1, 9), (-1, 9))]
 

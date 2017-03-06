@@ -53,9 +53,11 @@ patterns_plan = [
     url(r'^(?P<pk>\d+)/edit/$',
         login_required(plan.PlanEditView.as_view()),
         name='edit'),
-    url(r'^(?P<id>\d+)/pdf/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
+    url(
+     r'^(?P<id>\d+)/pdf/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
         plan.export_pdf,
-        name='export-pdf'),
+        name='export-pdf'
+     ),
     url(r'^(?P<id>\d+)/pdf/$',
         plan.export_pdf,
         name='export-pdf'),

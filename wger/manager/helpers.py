@@ -353,7 +353,8 @@ class WorkoutCalendar(HTMLCalendar):
                 'data-log="log-{1}" '
                 'class="btn btn-block {2} calendar-link">'.format(url,
                                                                   formatted_date,
-                                                                  background_css), repr(day), '</a>']
+                                                                  background_css), repr(day),
+                '</a>']
         return self.day_cell(cssclass, '{0}'.format(''.join(body)))
 
     def formatmonth(self, year, month):
@@ -362,7 +363,8 @@ class WorkoutCalendar(HTMLCalendar):
         calendar module but with additional bootstrap classes
         """
         self.year, self.month = year, month
-        out = ['<table class="month table table-bordered">\n', self.formatmonthname(year, month), '\n',
+        out = ['<table class="month table table-bordered">\n', self.formatmonthname(year, month),
+               '\n',
                self.formatweekheader(), '\n']
         for week in self.monthdays2calendar(year, month):
             out.append(self.formatweek(week))

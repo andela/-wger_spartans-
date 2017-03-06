@@ -289,8 +289,10 @@ def gym_permissions_user_edit(request, user_pk):
                                       available_roles=form_group_permission)
 
     context = {'title': member.get_full_name(), 'form': form,
-               'form_action': reverse('gym:gym:edit-user-permission', kwargs={'user_pk': member.pk}),
-               'extend_template': 'base_empty.html' if request.is_ajax() else 'base.html', 'submit_text': 'Save'}
+               'form_action': reverse('gym:gym:edit-user-permission',
+                                      kwargs={'user_pk': member.pk}),
+               'extend_template': 'base_empty.html' if request.is_ajax() else 'base.html',
+               'submit_text': 'Save'}
 
     return render(request, 'form.html', context)
 
