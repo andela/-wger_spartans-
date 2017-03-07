@@ -42,35 +42,35 @@ logger = logging.getLogger(__name__)
 #
 
 class Html5DateInput(DateInput):
-    '''
+    """
     Custom Input class that is rendered with an HTML5 type="date"
 
     This is specially useful in mobile devices
-    '''
+    """
     input_type = 'date'
 
 
 class Html5FormDateField(fields.DateField):
-    '''
+    """
     HTML5 form date field
-    '''
+    """
     widget = Html5DateInput
 
 
 class Html5TimeInput(TextInput):
-    '''
+    """
     Custom Input class that is rendered with an HTML5 type="time"
 
     This is specially useful in mobile devices and not available
     with older versions of django.
-    '''
+    """
     input_type = 'time'
 
 
 class Html5FormTimeField(fields.TimeField):
-    '''
+    """
     HTML5 form time field
-    '''
+    """
     widget = Html5TimeInput
 
 
@@ -79,12 +79,12 @@ class Html5FormTimeField(fields.TimeField):
 #
 
 class Html5NumberInput(TextInput):
-    '''
+    """
     Custom Input class that is rendered with an HTML5 type="number"
 
     This is specially useful in mobile devices and not available
     with older versions of django.
-    '''
+    """
     input_type = 'number'
 
 
@@ -92,21 +92,20 @@ class Html5NumberInput(TextInput):
 # Others
 #
 class ExerciseAjaxSelect(SelectMultiple):
-    '''
+    """
     Custom widget that allows to select exercises from an autocompleter
 
     This is basically a modified MultipleSelect widget
-    '''
+    """
 
     def render(self, name, value, attrs=None, choices=()):
         if value is None:
             value = []
 
-        output = [u'<div>']
-        output.append(u'<input type="text" id="exercise-search" class="form-control">')
-        output.append(u'</div>')
+        output = [u'<div>', u'<input type="text" id="exercise-search" class="form-control">',
+                  u'</div>',
+                  '<div id="exercise-search-log">']
 
-        output.append('<div id="exercise-search-log">')
         options = self.render_options(choices, value)
         if options:
             output.append(options)
@@ -145,11 +144,11 @@ class ExerciseAjaxSelect(SelectMultiple):
 
 
 class CheckboxChoiceInputTranslated(CheckboxChoiceInput):
-    '''
+    """
     Overwritten CheckboxChoiceInput
 
     This only translated the text for the select widgets
-    '''
+    """
     input_type = 'checkbox'
 
     def __init__(self, name, value, attrs, choice, index):
@@ -159,12 +158,12 @@ class CheckboxChoiceInputTranslated(CheckboxChoiceInput):
 
 
 class CheckboxChoiceInputTranslatedOriginal(CheckboxChoiceInput):
-    '''
+    """
     Overwritten CheckboxChoiceInput
 
     This only translated the text for the select widgets, showing the original
     string as well.
-    '''
+    """
     input_type = 'checkbox'
 
     def __init__(self, name, value, attrs, choice, index):
@@ -207,25 +206,25 @@ class BootstrapSelectMultipleTranslatedOriginal(CheckboxSelectMultiple):
 
 
 class TranslatedSelectMultiple(BootstrapSelectMultiple):
-    '''
+    """
     A SelectMultiple widget that translates the options
-    '''
+    """
     pass
 
 
 class TranslatedOriginalSelectMultiple(BootstrapSelectMultipleTranslatedOriginal):
-    '''
+    """
     A SelectMultiple widget that translates the options, showing the original
     string as well. This is currently only used in the muscle list, where the
     translated muscles as well as the latin names are shown.
-    '''
+    """
     pass
 
 
 class TranslatedSelect(Select):
-    '''
+    """
     A Select widget that translates the options
-    '''
+    """
 
     def render_option(self, selected_choices, option_value, option_label):
         return super(TranslatedSelect, self).render_option(selected_choices,

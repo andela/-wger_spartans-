@@ -33,9 +33,9 @@ logger = logging.getLogger(__name__)
 
 
 class ScheduleShareButtonTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Test that the share button is correctly displayed and hidden
-    '''
+    """
 
     def test_share_button(self):
         workout = Workout.objects.get(pk=2)
@@ -53,14 +53,14 @@ class ScheduleShareButtonTestCase(WorkoutManagerTestCase):
 
 
 class ScheduleAccessTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Test accessing the workout page
-    '''
+    """
 
     def test_access_shared(self):
-        '''
+        """
         Test accessing the URL of a shared workout
-        '''
+        """
         workout = Schedule.objects.get(pk=2)
 
         self.user_login('admin')
@@ -76,9 +76,9 @@ class ScheduleAccessTestCase(WorkoutManagerTestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_access_not_shared(self):
-        '''
+        """
         Test accessing the URL of a private workout
-        '''
+        """
         workout = Schedule.objects.get(pk=1)
 
         self.user_login('admin')
@@ -95,22 +95,22 @@ class ScheduleAccessTestCase(WorkoutManagerTestCase):
 
 
 class ScheduleRepresentationTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Test the representation of a model
-    '''
+    """
 
     def test_representation(self):
-        '''
+        """
         Test that the representation of an object is correct
-        '''
+        """
         self.assertEqual("{0}".format(Schedule.objects.get(pk=1)),
                          'my cool schedule that i found on the internet')
 
 
 class CreateScheduleTestCase(WorkoutManagerAddTestCase):
-    '''
+    """
     Tests adding a schedule
-    '''
+    """
 
     object_class = Schedule
     url = 'manager:schedule:add'
@@ -123,9 +123,9 @@ class CreateScheduleTestCase(WorkoutManagerAddTestCase):
 
 
 class DeleteScheduleTestCase(WorkoutManagerDeleteTestCase):
-    '''
+    """
     Tests deleting a schedule
-    '''
+    """
 
     object_class = Schedule
     url = 'manager:schedule:delete'
@@ -135,9 +135,9 @@ class DeleteScheduleTestCase(WorkoutManagerDeleteTestCase):
 
 
 class EditScheduleTestCase(WorkoutManagerEditTestCase):
-    '''
+    """
     Tests editing a schedule
-    '''
+    """
 
     object_class = Schedule
     url = 'manager:schedule:edit'
@@ -149,14 +149,14 @@ class EditScheduleTestCase(WorkoutManagerEditTestCase):
 
 
 class ScheduleTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Other tests
-    '''
+    """
 
     def schedule_detail_page(self):
-        '''
+        """
         Helper function
-        '''
+        """
 
         response = self.client.get(reverse('manager:schedule:view', kwargs={'pk': 2}))
         self.assertEqual(response.status_code, 200)
@@ -171,17 +171,17 @@ class ScheduleTestCase(WorkoutManagerTestCase):
         self.assertNotContains(response, 'This schedule is a loop')
 
     def test_schedule_detail_page_owner(self):
-        '''
+        """
         Tests the schedule detail page as the owning user
-        '''
+        """
 
         self.user_login()
         self.schedule_detail_page()
 
     def test_schedule_overview(self):
-        '''
+        """
         Tests the schedule overview
-        '''
+        """
         self.user_login()
 
         response = self.client.get(reverse('manager:schedule:overview'))
@@ -199,16 +199,16 @@ class ScheduleTestCase(WorkoutManagerTestCase):
             self.assertFalse(response.context['schedules'][i].is_active)
 
     def test_schedule_active(self):
-        '''
+        """
         Tests that only one schedule can be active at a time (per user)
-        '''
+        """
 
         def get_schedules():
             schedule1 = Schedule.objects.get(pk=2)
             schedule2 = Schedule.objects.get(pk=3)
             schedule3 = Schedule.objects.get(pk=4)
 
-            return (schedule1, schedule2, schedule3)
+            return schedule1, schedule2, schedule3
 
         self.user_login()
         (schedule1, schedule2, schedule3) = get_schedules()
@@ -229,9 +229,9 @@ class ScheduleTestCase(WorkoutManagerTestCase):
         self.assertFalse(schedule3.is_active)
 
     def start_schedule(self, fail=False):
-        '''
+        """
         Helper function
-        '''
+        """
 
         schedule = Schedule.objects.get(pk=2)
         self.assertFalse(schedule.is_active)
@@ -249,78 +249,78 @@ class ScheduleTestCase(WorkoutManagerTestCase):
             self.assertEqual(schedule.start_date, datetime.date.today())
 
     def test_start_schedule_owner(self):
-        '''
+        """
         Tests starting a schedule as the owning user
-        '''
+        """
 
         self.user_login()
         self.start_schedule()
 
     def test_start_schedule_other(self):
-        '''
+        """
         Tests starting a schedule as a different user
-        '''
+        """
 
         self.user_login('test')
         self.start_schedule(fail=True)
 
     def test_start_schedule_anonymous(self):
-        '''
+        """
         Tests starting a schedule as a logged out user
-        '''
+        """
 
         self.start_schedule(fail=True)
 
 
 class ScheduleEndDateTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Test the schedule's get_end_date method
-    '''
+    """
 
     def test_loop_schedule(self):
-        '''
+        """
         Loop schedules have no end date
-        '''
+        """
         schedule = Schedule.objects.get(pk=2)
         self.assertTrue(schedule.is_loop)
         self.assertFalse(schedule.get_end_date())
 
     def test_calculate(self):
-        '''
+        """
         Test the actual calculation
 
         Steps: 3, 5 and 2 weeks, starting on the 2013-04-21
-        '''
+        """
         schedule = Schedule.objects.get(pk=2)
         schedule.is_loop = False
         schedule.save()
         self.assertEqual(schedule.get_end_date(), datetime.date(2013, 6, 30))
 
     def test_empty_schedule(self):
-        '''
+        """
         Test the end date with an empty schedule
-        '''
+        """
         schedule = Schedule.objects.get(pk=3)
         self.assertEqual(schedule.get_end_date(), schedule.start_date)
 
 
 class ScheduleModelTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Tests the model methods
-    '''
+    """
 
     def delete_objects(self, user):
-        '''
+        """
         Helper function
-        '''
+        """
 
         Workout.objects.filter(user=user).delete()
         Schedule.objects.filter(user=user).delete()
 
     def create_schedule(self, user, start_date=datetime.date.today(), is_loop=False):
-        '''
+        """
         Helper function
-        '''
+        """
 
         schedule = Schedule()
         schedule.user = user
@@ -332,9 +332,9 @@ class ScheduleModelTestCase(WorkoutManagerTestCase):
         return schedule
 
     def create_workout(self, user):
-        '''
+        """
         Helper function
-        '''
+        """
 
         workout = Workout()
         workout.user = user
@@ -342,9 +342,9 @@ class ScheduleModelTestCase(WorkoutManagerTestCase):
         return workout
 
     def test_get_workout_steps_test_1(self):
-        '''
+        """
         Test with no workouts and no schedule steps
-        '''
+        """
         self.user_login('test')
         user = User.objects.get(pk=2)
         self.delete_objects(user)
@@ -353,9 +353,9 @@ class ScheduleModelTestCase(WorkoutManagerTestCase):
         self.assertFalse(schedule.get_current_scheduled_workout())
 
     def test_get_workout_steps_test_2(self):
-        '''
+        """
         Test with one schedule step
-        '''
+        """
         self.user_login('test')
         user = User.objects.get(pk=2)
         self.delete_objects(user)
@@ -370,9 +370,9 @@ class ScheduleModelTestCase(WorkoutManagerTestCase):
         self.assertEqual(schedule.get_current_scheduled_workout().workout, workout)
 
     def test_get_workout_steps_test_3(self):
-        '''
+        """
         Test with 3 steps
-        '''
+        """
         self.user_login('test')
         user = User.objects.get(pk=2)
         self.delete_objects(user)
@@ -405,9 +405,9 @@ class ScheduleModelTestCase(WorkoutManagerTestCase):
         self.assertEqual(schedule.get_current_scheduled_workout().workout, workout2)
 
     def test_get_workout_steps_test_4(self):
-        '''
+        """
         Test with 3 steps. Start is too far in the past, schedule ist not a loop
-        '''
+        """
         self.user_login('test')
         user = User.objects.get(pk=2)
         self.delete_objects(user)
@@ -440,9 +440,9 @@ class ScheduleModelTestCase(WorkoutManagerTestCase):
         self.assertFalse(schedule.get_current_scheduled_workout())
 
     def test_get_workout_steps_test_5(self):
-        '''
+        """
         Test with 3 steps. Start is too far in the past but schedule is a loop
-        '''
+        """
         self.user_login('test')
         user = User.objects.get(pk=2)
         self.delete_objects(user)
@@ -476,14 +476,14 @@ class ScheduleModelTestCase(WorkoutManagerTestCase):
 
 
 class SchedulePdfExportTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Test exporting a schedule as a pdf
-    '''
+    """
 
     def export_pdf_token(self, pdf_type="log"):
-        '''
+        """
         Helper function to test exporting a workout as a pdf using tokens
-        '''
+        """
 
         user = User.objects.get(username='test')
         uid, token = make_token(user)
@@ -511,9 +511,9 @@ class SchedulePdfExportTestCase(WorkoutManagerTestCase):
         self.assertEqual(response.status_code, 403)
 
     def export_pdf(self, fail=False, pdf_type="log"):
-        '''
+        """
         Helper function to test exporting a workout as a pdf
-        '''
+        """
 
         response = self.client.get(reverse('manager:schedule:pdf-{0}'.format(pdf_type),
                                            kwargs={'pk': 1}))
@@ -531,9 +531,9 @@ class SchedulePdfExportTestCase(WorkoutManagerTestCase):
             self.assertLess(int(response['Content-Length']), 35000)
 
     def export_pdf_with_comments(self, fail=False, pdf_type="log"):
-        '''
+        """
         Helper function to test exporting a workout as a pdf, with exercise coments
-        '''
+        """
 
         user = User.objects.get(username='test')
         uid, token = make_token(user)
@@ -557,9 +557,9 @@ class SchedulePdfExportTestCase(WorkoutManagerTestCase):
             self.assertLess(int(response['Content-Length']), 35000)
 
     def export_pdf_with_images(self, fail=False, pdf_type="log"):
-        '''
+        """
         Helper function to test exporting a workout as a pdf, with exercise images
-        '''
+        """
         user = User.objects.get(username='test')
         uid, token = make_token(user)
         response = self.client.get(reverse('manager:schedule:pdf-{0}'.format(pdf_type),
@@ -582,9 +582,9 @@ class SchedulePdfExportTestCase(WorkoutManagerTestCase):
             self.assertLess(int(response['Content-Length']), 35000)
 
     def export_pdf_with_images_and_comments(self, fail=False, pdf_type="log"):
-        '''
+        """
         Helper function to test exporting a workout as a pdf, with images and comments
-        '''
+        """
 
         user = User.objects.get(username='test')
         uid, token = make_token(user)
@@ -608,51 +608,51 @@ class SchedulePdfExportTestCase(WorkoutManagerTestCase):
             self.assertLess(int(response['Content-Length']), 35000)
 
     def test_export_pdf_log_anonymous(self):
-        '''
+        """
         Tests exporting a workout as a pdf as an anonymous user
-        '''
+        """
 
         self.export_pdf(fail=True)
         self.export_pdf_token()
 
     def test_export_pdf_log_owner(self):
-        '''
+        """
         Tests exporting a workout as a pdf as the owner user
-        '''
+        """
 
         self.user_login('test')
         self.export_pdf(fail=False)
         self.export_pdf_token()
 
     def test_export_pdf_log_other(self):
-        '''
+        """
         Tests exporting a workout as a pdf as a logged user not owning the data
-        '''
+        """
 
         self.user_login('admin')
         self.export_pdf(fail=True)
         self.export_pdf_token()
 
     def test_export_pdf_log_with_comments(self, fail=False):
-        '''
+        """
         Tests exporting a workout as a pdf as the owner user with comments
-        '''
+        """
         self.user_login('test')
         self.export_pdf_with_comments(fail=False)
         self.export_pdf_token()
 
     def test_export_pdf_log_with_images(self, fail=False):
-        '''
+        """
         Tests exporting a workout as a pdf as the owner user with images
-        '''
+        """
         self.user_login('test')
         self.export_pdf_with_images(fail=False)
         self.export_pdf_token()
 
     def test_export_pdf_log_with_images_and_comments(self, fail=False):
-        '''
+        """
         Tests exporting a workout as a pdf as the owner user with images andcomments
-        '''
+        """
         self.user_login('test')
         self.export_pdf_with_images_and_comments(fail=False)
         self.export_pdf_token()
@@ -660,60 +660,60 @@ class SchedulePdfExportTestCase(WorkoutManagerTestCase):
 #   #####TABLE#####
 
     def test_export_pdf_table_anonymous(self):
-        '''
+        """
         Tests exporting a workout as a pdf as an anonymous user
-        '''
+        """
 
         self.export_pdf(fail=True, pdf_type="table")
         self.export_pdf_token(pdf_type="table")
 
     def test_export_pdf_table_owner(self):
-        '''
+        """
         Tests exporting a workout as a pdf as the owner user
-        '''
+        """
 
         self.user_login('test')
         self.export_pdf(fail=False, pdf_type="table")
         self.export_pdf_token(pdf_type="table")
 
     def test_export_pdf_table_other(self):
-        '''
+        """
         Tests exporting a workout as a pdf as a logged user not owning the data
-        '''
+        """
 
         self.user_login('admin')
         self.export_pdf(fail=True, pdf_type="table")
         self.export_pdf_token(pdf_type="table")
 
     def test_export_pdf_table_with_comments(self, fail=False):
-        '''
+        """
         Tests exporting a workout as a pdf as the owner user with comments
-        '''
+        """
         self.user_login('test')
         self.export_pdf_with_comments(fail=False, pdf_type="table")
         self.export_pdf_token(pdf_type="table")
 
     def test_export_pdf_table_with_images(self, fail=False):
-        '''
+        """
         Tests exporting a workout as a pdf as the owner user with images
-        '''
+        """
         self.user_login('test')
         self.export_pdf_with_images(fail=False, pdf_type="table")
         self.export_pdf_token(pdf_type="table")
 
     def test_export_pdf_table_with_images_and_comments(self, fail=False):
-        '''
+        """
         Tests exporting a workout as a pdf as the owner user with images andcomments
-        '''
+        """
         self.user_login('test')
         self.export_pdf_with_images_and_comments(fail=False, pdf_type="table")
         self.export_pdf_token(pdf_type="table")
 
 
 class ScheduleApiTestCase(api_base_test.ApiBaseResourceTestCase):
-    '''
+    """
     Tests the schedule overview resource
-    '''
+    """
     pk = 1
     resource = Schedule
     private_resource = True

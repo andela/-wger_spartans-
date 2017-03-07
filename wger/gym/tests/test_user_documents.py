@@ -22,9 +22,9 @@ from wger.gym.models import UserDocument
 
 
 class UserDocumentOverviewTest(WorkoutManagerAccessTestCase):
-    '''
+    """
     Tests accessing the user document overview page
-    '''
+    """
     url = reverse('gym:document:list', kwargs={'user_pk': 14})
     anonymous_fail = True
     user_success = ('trainer1',
@@ -39,9 +39,9 @@ class UserDocumentOverviewTest(WorkoutManagerAccessTestCase):
 
 
 class AddDocumentTestCase(WorkoutManagerAddTestCase):
-    '''
+    """
     Tests uploading a new user document
-    '''
+    """
 
     object_class = UserDocument
     url = reverse('gym:document:add', kwargs={'user_pk': 14})
@@ -59,9 +59,9 @@ class AddDocumentTestCase(WorkoutManagerAddTestCase):
 
 
 class EditDocumentTestCase(WorkoutManagerEditTestCase):
-    '''
+    """
     Tests editing a user document
-    '''
+    """
 
     pk = 2
     object_class = UserDocument
@@ -78,9 +78,9 @@ class EditDocumentTestCase(WorkoutManagerEditTestCase):
 
 
 class DeleteDocumentTestCase(WorkoutManagerDeleteTestCase):
-    '''
+    """
     Tests deleting a user document
-    '''
+    """
 
     pk = 1
     object_class = UserDocument

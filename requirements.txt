@@ -1,3 +1,4 @@
+captcha
 #
 # Requirements for wger for production
 #

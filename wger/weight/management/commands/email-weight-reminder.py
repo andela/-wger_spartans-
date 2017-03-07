@@ -29,9 +29,9 @@ from wger.weight.models import WeightEntry
 
 
 class Command(BaseCommand):
-    '''
+    """
     Helper admin command to send out email reminders
-    '''
+    """
 
     help = 'Send out automatic emails to remind the user to enter the weight'
 
@@ -59,12 +59,14 @@ class Command(BaseCommand):
 
     @staticmethod
     def send_email(user, last_entry, datediff):
-        '''
+        """
         Notify a user to input the weight entry
 
+        :param datediff:
+        :type datediff:
         :type user User
         :type last_entry Date
-        '''
+        """
 
         # Compose and send the email
         translation.activate(user.userprofile.notification_language.short_name)

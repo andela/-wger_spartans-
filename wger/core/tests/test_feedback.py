@@ -19,14 +19,14 @@ from wger.core.tests.base_testcase import WorkoutManagerTestCase
 
 
 class FeedbackTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Tests the feedback form
-    '''
+    """
 
     def send_feedback(self, logged_in=True):
-        '''
+        """
         Helper function
-        '''
+        """
         response = self.client.get(reverse('core:feedback'))
         self.assertEqual(response.status_code, 200)
         response = self.client.post(reverse('core:feedback'),
@@ -56,24 +56,24 @@ class FeedbackTestCase(WorkoutManagerTestCase):
             self.assertEqual(response.status_code, 200)
 
     def test_send_feedback_admin(self):
-        '''
+        """
         Tests the feedback form as an admin user
-        '''
+        """
 
         self.user_login('admin')
         self.send_feedback()
 
     def test_send_feedback_user(self):
-        '''
+        """
         Tests the feedback form as a regular user
-        '''
+        """
 
         self.user_login('test')
         self.send_feedback()
 
     def test_send_feedback_logged_out(self):
-        '''
+        """
         Tests the feedback form as a logged out user
-        '''
+        """
 
         self.send_feedback(logged_in=False)

@@ -25,9 +25,9 @@ from django.utils.translation import ugettext_lazy as _
 
 @python_2_unicode_compatible
 class WeightEntry(models.Model):
-    '''
+    """
     Model for a weight point
-    '''
+    """
     date = models.DateField(verbose_name=_('Date'))
     weight = models.DecimalField(verbose_name=_('Weight'),
                                  max_digits=5,
@@ -46,22 +46,22 @@ class WeightEntry(models.Model):
     '''
 
     class Meta:
-        '''
+        """
         Metaclass to set some other properties
-        '''
+        """
         verbose_name = _('Weight entry')
         ordering = ["date", ]
         get_latest_by = "date"
         unique_together = ("date", "user")
 
     def __str__(self):
-        '''
+        """
         Return a more human-readable representation
-        '''
+        """
         return u"{0}: {1:.2f} kg".format(self.date, self.weight)
 
     def get_owner_object(self):
-        '''
+        """
         Returns the object that has owner information
-        '''
+        """
         return self
