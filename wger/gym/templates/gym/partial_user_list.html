@@ -47,6 +47,13 @@ $(document).ready( function () {
             -/-
         {% endif %}
     </td>
+    <td>
+        {% if current_user.obj.is_active %}
+            <span class="label label-success">Active</span
+        {% else %}
+            <span class="label label-danger">Inactive</span>
+        {% endif %}
+    </td>
     {% endif %}
 </tr>
 {% endfor %}
