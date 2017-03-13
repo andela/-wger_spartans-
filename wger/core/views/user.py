@@ -546,17 +546,16 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                                 'username': request.user.username}))
                     except IntegrityError as e:
 
-                        if "UNIQUE constraint" in str(e):
+                        if "unique constraint" in str(e):
                             messages.info(request, _('Already synced up for today.'))
-
-                          # redirect to weight overview page if operations successful
+                            # redirect to weight overview page if operations successful
                             return HttpResponseRedirect(
                                 reverse('weight:overview', kwargs={
                                     'username': request.user.username}))
-                        else:
-                            messages.warning(request, _("Something went wrong"))
 
-                            return render(request, 'user/fitbit.html', template)
+                        messages.warning(request, _("Something went wrong") + str(e))
+
+                        return render(request, 'user/fitbit.html', template)
                 except:
                     messages.warning(request, _("Something went wrong, please try again later"))
             return render(request, 'user/fitbit.html', template)
@@ -636,7 +635,7 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                         messages.success(request, _('Successfully synced exercise data.'))
                     except IntegrityError as e:
 
-                        if "UNIQUE constraint" in str(e):
+                        if "unique constraint" in str(e):
                             messages.info(request, _('Already synced up exercises for today.'))
 
                             # redirect to exercise overview page if operations successful
