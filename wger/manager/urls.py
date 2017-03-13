@@ -17,6 +17,7 @@
 
 from django.conf.urls import patterns, url, include
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import cache_page
 
 from wger.manager.views import (
     pdf,
@@ -46,7 +47,7 @@ patterns_log = [
 # sub patterns for workouts
 patterns_workout = [
     url(r'^overview$',
-        workout.overview,
+        cache_page(1800) (workout.overview),
         name='overview'),
     url(r'^add$',
         workout.add,
