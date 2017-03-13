@@ -5,8 +5,6 @@
 {% block title %}{% trans "Your nutrition plans" %}{% endblock %}
 
 
-{% load cache %}
-{% cache 1800 nutrition %}
 {% block content %}
 <div class="list-group">
     {% for plan in plans %}
@@ -27,7 +25,7 @@
     {% endfor %}
 </div>
 {% endblock %}
-{% endcache %}
+
 
 
 
