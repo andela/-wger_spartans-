@@ -29,6 +29,7 @@ from wger.core.models import (
     WeightUnit)
 from wger.core.api.serializers import (
     UsernameSerializer,
+    UserRegistrationSerializer,
     LanguageSerializer,
     DaysOfWeekSerializer,
     LicenseSerializer,
@@ -38,6 +39,24 @@ from wger.core.api.serializers import (
 from wger.core.api.serializers import UserprofileSerializer
 from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
 
+
+class UserViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint that allows registration of users
+    """
+    serializer_class = UserRegistrationSerializer
+
+    def post(self, validated_data):
+        # Creates a user
+        user = User(
+            username = validated_data['username'],
+            email = validated_data['email'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+
+    
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """
