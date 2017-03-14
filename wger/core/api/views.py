@@ -45,13 +45,14 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows login and registration of users
     """
-    serializer_class = UserRegistrationSerializer  
+    serializer_class = UserRegistrationSerializer
+    http_method_names = ['post']
 
     def post(request, validated_data):
         # Creates a user
         user = User(
-            username = validated_data['username'],
-            email = validated_data['email'],
+            username=validated_data['username'],
+            email=validated_data['email'],
         )
         user.set_password(validated_data['password'])
         user.save()
