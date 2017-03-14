@@ -20,6 +20,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import detail_route
 
+
 from wger.core.models import (
     UserProfile,
     Language,
@@ -42,11 +43,11 @@ from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
 
 class UserViewSet(viewsets.ModelViewSet):
     """
-    API endpoint that allows registration of users
+    API endpoint that allows login and registration of users
     """
-    serializer_class = UserRegistrationSerializer
+    serializer_class = UserRegistrationSerializer  
 
-    def post(self, validated_data):
+    def post(request, validated_data):
         # Creates a user
         user = User(
             username = validated_data['username'],
@@ -56,7 +57,6 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         return user
 
-    
 
 class UserProfileViewSet(viewsets.ModelViewSet):
     """
