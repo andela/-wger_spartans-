@@ -35,10 +35,8 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'password')
-        read_only_fields = ('created_at', 'updated_at',)
-        http_method_names = ('post', 'get')
         extra_kwargs = {
-            'password':{'write_only': True}
+            'password': {'write_only': True}
         }
 
 
