@@ -73,6 +73,7 @@ from wger.exercises.models import (
 )
 from wger.utils.helpers import smart_capitalize
 from wger.core.models import License
+from wger.nutrition.models import Ingredient
 
 logger = logging.getLogger(__name__)
 
@@ -546,7 +547,7 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                                 'username': request.user.username}))
                     except IntegrityError as e:
 
-                        if "unique constraint" in str(e):
+                        if "UNIQUE CONSTRAINT" in str(e).upper():
                             messages.info(request, _('Already synced up for today.'))
                             # redirect to weight overview page if operations successful
                             return HttpResponseRedirect(
@@ -576,7 +577,7 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
 
         if "code" in request.GET:
             token_code = request.GET["code"]
-            # use fitbit library to get access token an retrieve weight
+            # use fitbit library to get access token an retrieve data
 
             try:
                 token = fitbit_client.fetch_access_token(token_code)
@@ -635,7 +636,7 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                         messages.success(request, _('Successfully synced exercise data.'))
                     except IntegrityError as e:
 
-                        if "unique constraint" in str(e):
+                        if "UNIQUE constraint failed" in str(e):
                             messages.info(request, _('Already synced up exercises for today.'))
 
                             # redirect to exercise overview page if operations successful
@@ -651,6 +652,85 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                                  str(e))
 
         return render(request, 'user/fitbit_weight.html', template)
+
+    @login_required()
+    def sync_fitbit_ingredients(request):
+        """  fitbit integration to retrieve frequent activities """
+        code = None
+        client_id = settings.WGER_SETTINGS['FITBIT_CLIENT_ID']
+        client_secret = settings.WGER_SETTINGS['FITBIT_CLIENT_SECRET']
+        call_back = settings.SITE_URL + reverse('core:user:fitbit-ingredients')
+        fitbit_client = FitbitOauth2Client(client_id, client_secret)
+        url = fitbit_client.authorize_token_url(redirect_uri=call_back)
+
+        template = {"fitbit_url": url[0]}
+
+        # retrieve the code from the redirect URL
+
+        if "code" in request.GET:
+            token_code = request.GET["code"]
+            # use fitbit library to get access token an retrieve data
+
+            food_collection = None
+            try:
+                token = fitbit_client.fetch_access_token(token_code)
+                if "access_token" in token:
+                    fitbit_request = Fitbit(client_id=client_id, client_secret=client_secret,
+                                            access_token=token["access_token"],
+                                            refresh_token=token["refresh_token"], system="en_UK")
+
+                    food_collection = fitbit_request._COLLECTION_RESOURCE('foods/log')
+            except BaseException as e:
+                messages.warning(request, _('Something went wrong. \n') + str(e))
+
+            if food_collection:
+
+                for item in food_collection['foods']:
+                    logged_food_names = item.get('loggedFood').get('name')
+                    messages.success(request, _('Food names = ') + str(logged_food_names))
+                    nutrition_values = item.get('nutritionalValues')
+                    if nutrition_values:
+                        calories = nutrition_values.get('calories', 0)
+                        carbs = nutrition_values.get('carbs', 0)
+                        fat = nutrition_values.get('fat', 0)
+                        fiber = nutrition_values.get('fiber', 0)
+                        protein = nutrition_values.get('protein', 0)
+                        sodium = nutrition_values.get('sodium', 0)
+
+                    else:
+                        calories, carbs, fat, fiber, protein, sodium = [0, 0, 0, 0, 0, 0]
+
+                    try:
+                        new_ingredient = Ingredient()
+                        if not Ingredient.objects.filter(name=logged_food_names).exists():
+                            new_ingredient.user = request.user
+                            new_ingredient.name = logged_food_names
+                            new_ingredient.carbohydrates = carbs
+                            new_ingredient.fat = fat
+                            new_ingredient.fibres = fiber
+                            new_ingredient.protein = protein
+                            new_ingredient.sodium = sodium
+                            new_ingredient.energy = calories
+                            if not Language.objects.filter(short_name='en').exists():
+                                new_ingredient.language = Language(short_name='en',
+                                                             full_name='English')
+                            else:
+                                new_ingredient.language = Language.objects.get(short_name='en')
+
+                            new_ingredient.save()
+                            messages.success(request, _('Food details = ') + str('Food_name = {}'
+                                                                                 'Carbs = {}, '
+                                                                                 'fat = {}, '
+                                                                                 'fiber = '
+                                                                                 '{},  protein ='
+                                                                                 ' {}, sodium  = '
+                                                                                 '{}'.format(
+                                logged_food_names, carbs, fat, fiber, protein, sodium)))
+                    except BaseException as e:
+                        messages.warning(request, _('Something went wrong ') + str(e))
+            else:
+                messages.warning(request, _('Could not get food details'))
+        return render(request, 'user/fitbit_ingredients.html', template)
 
 
 class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
@@ -687,3 +767,5 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                                           _('Gym')],
                                  'users': context['object_list']['members']}
         return context
+
+
