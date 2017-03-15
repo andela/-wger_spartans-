@@ -98,7 +98,7 @@ router.register(r'workoutlog', manager_api_views.WorkoutLogViewSet, base_name='w
 
 # Core app
 router.register(r'userprofile', core_api_views.UserProfileViewSet, base_name='userprofile')
-router.register(r'user/registration', core_api_views.UserViewSet, base_name='user')
+router.register(r'user', core_api_views.UserViewSet, base_name='user')
 router.register(r'language', core_api_views.LanguageViewSet, base_name='language')
 router.register(r'daysofweek', core_api_views.DaysOfWeekViewSet, base_name='daysofweek')
 router.register(r'license', core_api_views.LicenseViewSet, base_name='license')
@@ -132,7 +132,10 @@ router.register(r'ingredient', nutrition_api_views.IngredientViewSet, base_name=
 router.register(r'weightunit', nutrition_api_views.WeightUnitViewSet, base_name='weightunit')
 router.register(r'ingredientweightunit', nutrition_api_views.IngredientWeightUnitViewSet,
                 base_name='ingredientweightunit')
-router.register(r'nutritionplan', nutrition_api_views.NutritionPlanViewSet, base_name='nutritionplan')
+router.register(
+    r'nutritionplan',
+    nutrition_api_views.NutritionPlanViewSet,
+    base_name='nutritionplan')
 router.register(r'meal', nutrition_api_views.MealViewSet, base_name='meal')
 router.register(r'mealitem', nutrition_api_views.MealItemViewSet, base_name='mealitem')
 
