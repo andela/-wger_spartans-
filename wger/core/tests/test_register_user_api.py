@@ -1,15 +1,14 @@
-from wger.core.tests.base_testcase import WorkoutManagerTestCase
+from django.contrib.auth.models import User
+from wger.core.tests.api_base_test import ApiPostTestCase
 
 
-class UserRegistrationTests(WorkoutManagerTestCase):
+
+class UserRegistrationTests(ApiPostTestCase):
     """
     Test the API endpoint for registration registration
     of users
     """
+    resource = User
+    url = '/api/v2/user/registration/'
+    data = {'username': 'giddy254', 'password': 'password'}
 
-    def test_registration_endpoint(self):
-        # Test for user registration
-        url = '/api/v2/user/registration/'
-        data = {'username': 'giddy254', 'password': 'password'}
-        response = self.client.post(url, data)
-        self.assertEqual(response.status_code, 201)
