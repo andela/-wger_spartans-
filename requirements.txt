@@ -20,6 +20,7 @@ django-sortedm2m
 django-bower
 invoke
 requests
+fitbit
 
 # REST API
 djangorestframework>=3.2,<3.3
