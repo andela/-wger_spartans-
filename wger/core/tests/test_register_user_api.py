@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from wger.core.tests.base_testcase import WorkoutManagerTestCase
 
 
