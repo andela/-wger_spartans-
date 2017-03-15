@@ -38,7 +38,8 @@ from wger.core.api.serializers import (
     WeightUnitSerializer
 )
 from wger.core.api.serializers import UserprofileSerializer
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, \
+    TokenAuthentication
 from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
 from rest_framework.permissions import IsAuthenticated
 
