@@ -14,7 +14,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 # along with Workout Manager.  If not, see <http://www.gnu.org/licenses/>.
+import re
 
+from django.db import IntegrityError
 from django.contrib.auth.models import User
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -38,21 +40,66 @@ from wger.core.api.serializers import (
     WeightUnitSerializer
 )
 from wger.core.api.serializers import UserprofileSerializer
+from wger.core.models import Language
+from rest_framework import status
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication, \
     TokenAuthentication
 from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
+from django.utils import translation
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from django.contrib.auth.hashers import make_password
+from rest_framework import serializers
+from wger.config.models import GymConfig
 
 
-class UserViewSet(viewsets.ModelViewSet):
+class RegisterUserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows login and registration of users
     """
     serializer_class = UserRegistrationSerializer
-    http_method_names = ['post', 'get']
+    http_method_names = ['post']
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
-    queryset = User.objects.all().order_by('-date_joined')
+
+    def create(self, request):
+        # Creates a user and assign them a default gym
+
+        # validates email address
+        if request.data.get('email'):
+            email_format = re.compile(r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)')
+            if not re.match(email_format, request.data.get('email')):
+                raise serializers.ValidationError("Invalid email format")
+
+        user = User(username=request.data['username'], email=request.data.get('email', None))
+        # Hashes user's password
+        user.password = make_password(request.data['password'])
+        # Handles case for when the user already exists
+        try:
+            user.save()
+        except IntegrityError:
+            content = {"message": "User already exists"}
+            return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+        # Sets the language for the user
+        language = Language.objects.get(short_name=translation.get_language())
+        user.userprofile.notification_language = language
+
+        # Sets default gym, if needed
+        gym_config = GymConfig.objects.get(pk=1)
+        if gym_config.default_gym:
+            user.userprofile.gym = gym_config.default_gym
+
+            # Creates gym user configuration object
+            config = GymUserConfig()
+            config.gym = gym_config.default_gym
+            config.user = user
+            config.save()
+
+        user.userprofile.save()
+
+        serializer = UserRegistrationSerializer(user)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
