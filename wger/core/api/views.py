@@ -38,7 +38,9 @@ from wger.core.api.serializers import (
     WeightUnitSerializer
 )
 from wger.core.api.serializers import UserprofileSerializer
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
 from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
+from rest_framework.permissions import IsAuthenticated
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -46,17 +48,10 @@ class UserViewSet(viewsets.ModelViewSet):
     API endpoint that allows login and registration of users
     """
     serializer_class = UserRegistrationSerializer
-    http_method_names = ['post']
-
-    def post(request, validated_data):
-        # Creates a user
-        user = User(
-            username=validated_data['username'],
-            email=validated_data['email'],
-        )
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+    http_method_names = ['post', 'get']
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    queryset = User.objects.all().order_by('-date_joined')
 
 
 class UserProfileViewSet(viewsets.ModelViewSet):
