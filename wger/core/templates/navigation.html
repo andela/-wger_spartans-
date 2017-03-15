@@ -112,6 +112,10 @@
                             <li><a href="{% url 'nutrition:ingredient:list' %}">{% trans "Ingredient overview" %}</a></li>
                             <li><a href="{% url 'nutrition:bmi:view' %}" rel="nofollow">{% trans "BMI calculator" %}</a></li>
                             <li><a href="{% url 'nutrition:calories:view' %}" rel="nofollow">{% trans "Daily calories calculator" %}</a></li>
+                             <li>
+                                        <a href="{% url 'core:user:fitbit-ingredients' %}">
+                                            {% trans "Fitbit Sync Ingredients" %}</a>
+                                   </li>
                             {% if perms.nutrition %}
                                 <li class="divider"></li>
                                 <li class="dropdown-header">{% trans "Administration" %}</li>
