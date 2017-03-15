@@ -532,8 +532,8 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                                          system="en_UK")
                         user_prof = fit_req.user_profile_get()
                         weight = user_prof["user"]["weight"]
-                      # add the user weight to the database
-                      # initialise the weight entry class for saving to DB
+                        # add the user weight to the database
+                        # initialise the weight entry class for saving to DB
 
                     try:
                         fetched_weight = WeightEntry()
@@ -713,19 +713,16 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                             new_ingredient.energy = calories
                             if not Language.objects.filter(short_name='en').exists():
                                 new_ingredient.language = Language(short_name='en',
-                                                             full_name='English')
+                                                                   full_name='English')
                             else:
                                 new_ingredient.language = Language.objects.get(short_name='en')
 
                             new_ingredient.save()
-                            messages.success(request, _('Food details = ') + str('Food_name = {}'
-                                                                                 'Carbs = {}, '
-                                                                                 'fat = {}, '
-                                                                                 'fiber = '
-                                                                                 '{},  protein ='
-                                                                                 ' {}, sodium  = '
-                                                                                 '{}'.format(
-                                logged_food_names, carbs, fat, fiber, protein, sodium)))
+                            messages.success(request, _('Food details = ')
+                                             + str('Food_name = {}''Carbs = {},fat = {}, '
+                                                   'fiber = {},  protein ={}, sodium  ={}'
+                                                   .format(logged_food_names, carbs, fat, fiber,
+                                                           protein, sodium)))
                     except BaseException as e:
                         messages.warning(request, _('Something went wrong ') + str(e))
             else:
