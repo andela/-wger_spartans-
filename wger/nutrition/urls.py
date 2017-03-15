@@ -21,6 +21,7 @@ from django.conf.urls import (
     url,
     include
 )
+from django.views.decorators.cache import cache_page
 
 from wger.nutrition.views import (
     ingredient,
@@ -36,7 +37,7 @@ from wger.nutrition.views import (
 # sub patterns for nutritional plans
 patterns_plan = [
     url(r'^overview/$',
-        plan.overview,
+        cache_page(1800) (plan.overview),
         name='overview'),
     url(r'^add/$',
         plan.add,
