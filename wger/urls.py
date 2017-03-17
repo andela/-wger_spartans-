@@ -98,6 +98,8 @@ router.register(r'workoutlog', manager_api_views.WorkoutLogViewSet, base_name='w
 
 # Core app
 router.register(r'userprofile', core_api_views.UserProfileViewSet, base_name='userprofile')
+router.register(r'user-registration', core_api_views.UserRegistration, base_name='userregistration')
+router.register(r'all-user-info', core_api_views.AllUserInfo, base_name='alluserinfo')
 router.register(r'language', core_api_views.LanguageViewSet, base_name='language')
 router.register(r'daysofweek', core_api_views.DaysOfWeekViewSet, base_name='daysofweek')
 router.register(r'license', core_api_views.LicenseViewSet, base_name='license')
@@ -111,6 +113,7 @@ router.register(
 
 # Exercises app
 router.register(r'exercise', exercises_api_views.ExerciseViewSet, base_name='exercise')
+router.register(r'exercise-info', exercises_api_views.ExerciseInfoViewSet, base_name='exerciseinfo')
 router.register(r'equipment', exercises_api_views.EquipmentViewSet, base_name='api')
 router.register(
     r'exercisecategory',
@@ -188,6 +191,8 @@ urlpatterns += [
         name='ingredient-search'),
     url(r'^api/v2/', include(router.urls)),
 ]
+
+
 
 #
 # URL for user uploaded files, served like this during development only

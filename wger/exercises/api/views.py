@@ -45,6 +45,16 @@ from wger.exercises.models import (
 from wger.utils.language import load_item_languages, load_language
 from wger.utils.permissions import CreateOnlyPermission
 
+class ExerciseInfoViewSet(viewsets.ModelViewSet):
+    '''
+    API endpoint for all the exercise information
+    '''
+    serializer_class = ExerciseSerializer
+    def get_queryset(self):
+        id = self.request.query_params.get('id', None)
+        queryset = Exercise.objects.filter(id=id)
+        return queryset
+       
 
 class ExerciseViewSet(viewsets.ModelViewSet):
     """
