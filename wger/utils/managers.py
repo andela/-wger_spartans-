@@ -27,6 +27,7 @@ Custom managers and querysets
 
 
 class SubmissionQuerySet(QuerySet):
+
     def accepted(self):
         return self.filter(status=AbstractSubmissionModel.STATUS_ACCEPTED)
 

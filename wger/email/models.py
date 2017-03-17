@@ -21,9 +21,9 @@ from wger.gym.models import Gym
 
 
 class Log(models.Model):
-    '''
+    """
     A log of a sent email
-    '''
+    """
 
     class Meta:
         ordering = ["-date", ]
@@ -58,16 +58,16 @@ class Log(models.Model):
     '''
 
     def __unicode__(self):
-        '''
+        """
         Return a more human-readable representation
-        '''
+        """
         return self.subject
 
 
 class CronEntry(models.Model):
-    '''
+    """
     Simple list of emails to be sent by a cron job
-    '''
+    """
 
     log = models.ForeignKey(Log,
                             editable=False)
@@ -81,7 +81,7 @@ class CronEntry(models.Model):
     '''
 
     def __unicode__(self):
-        '''
+        """
         Return a more human-readable representation
-        '''
+        """
         return self.email

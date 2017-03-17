@@ -47,9 +47,9 @@ class ExerciseImageEditView(WgerFormMixin,
                             LoginRequiredMixin,
                             PermissionRequiredMixin,
                             UpdateView):
-    '''
+    """
     Generic view to update an existing exercise image
-    '''
+    """
 
     model = ExerciseImage
     title = ugettext_lazy('Edit exercise image')
@@ -73,9 +73,9 @@ class ExerciseImageAddView(WgerFormMixin,
                            LoginRequiredMixin,
                            PermissionRequiredMixin,
                            CreateView):
-    '''
+    """
     Generic view to add a new exercise image
-    '''
+    """
 
     model = ExerciseImage
     title = ugettext_lazy('Add new image')
@@ -91,9 +91,9 @@ class ExerciseImageAddView(WgerFormMixin,
         return reverse('exercise:exercise:view', kwargs={'id': self.object.exercise.id})
 
     def get_context_data(self, **kwargs):
-        '''
+        """
         Send some additional data to the template
-        '''
+        """
         context = super(ExerciseImageAddView, self).get_context_data(**kwargs)
         context['enctype'] = 'multipart/form-data'
         context['form_action'] = reverse('exercise:image:add',
@@ -106,9 +106,9 @@ class ExerciseImageDeleteView(WgerDeleteMixin,
                               LoginRequiredMixin,
                               PermissionRequiredMixin,
                               DeleteView):
-    '''
+    """
     Generic view to delete an existing exercise image
-    '''
+    """
 
     model = ExerciseImage
     fields = ('image', 'is_main')
@@ -116,15 +116,15 @@ class ExerciseImageDeleteView(WgerDeleteMixin,
     permission_required = 'exercises.delete_exerciseimage'
 
     def get_success_url(self):
-        '''
+        """
         Return to exercise image
-        '''
+        """
         return reverse('exercise:exercise:view', kwargs={'id': self.kwargs['exercise_pk']})
 
     def get_context_data(self, **kwargs):
-        '''
+        """
         Send some additional data to the template
-        '''
+        """
         pk = self.kwargs['pk']
         exercise_pk = self.kwargs['exercise_pk']
         context = super(ExerciseImageDeleteView, self).get_context_data(**kwargs)
@@ -138,9 +138,9 @@ class ExerciseImageDeleteView(WgerDeleteMixin,
 
 @permission_required('exercises.change_exerciseimage')
 def accept(request, pk):
-    '''
+    """
     Accepts a pending user submitted image and emails the user, if possible
-    '''
+    """
     image = get_object_or_404(ExerciseImage, pk=pk)
     image.status = ExerciseImage.STATUS_ACCEPTED
     image.save()
@@ -151,9 +151,9 @@ def accept(request, pk):
 
 @permission_required('exercises.change_exerciseimage')
 def decline(request, pk):
-    '''
+    """
     Declines and deletes a pending user submitted image
-    '''
+    """
     image = get_object_or_404(ExerciseImage, pk=pk)
     image.status = ExerciseImage.STATUS_DECLINED
     image.save()

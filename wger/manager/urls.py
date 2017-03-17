@@ -43,7 +43,6 @@ patterns_log = [
         name='delete')
 ]
 
-
 # sub patterns for workouts
 patterns_workout = [
     url(r'^overview$',
@@ -85,9 +84,10 @@ patterns_workout = [
     url(r'^(?P<pk>\d+)/ical$',
         ical.export,
         name='ical'),
-    url(r'^(?P<id>\d+)/pdf/log/(?P<images>[01]+)/(?P<comments>[01]+)/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
+    url(
+        r'^(?P<id>\d+)/pdf/log/(?P<images>[01]+)/(?P<comments>[01]+)/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
         pdf.workout_log,
-        name='pdf-log'), #JS!
+        name='pdf-log'),  # JS!
     url(r'^(?P<id>\d+)/pdf/log/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
         pdf.workout_log,
         name='pdf-log'),
@@ -97,9 +97,10 @@ patterns_workout = [
     url(r'^(?P<id>\d+)/pdf/log$',
         pdf.workout_log,
         name='pdf-log'),
-    url(r'^(?P<id>\d+)/pdf/table/(?P<images>[01]+)/(?P<comments>[01]+)/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
+    url(
+        r'^(?P<id>\d+)/pdf/table/(?P<images>[01]+)/(?P<comments>[01]+)/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
         pdf.workout_view,
-        name='pdf-table'), #JS!
+        name='pdf-table'),  # JS!
     url(r'^(?P<id>\d+)/pdf/table/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})$',
         pdf.workout_view,
         name='pdf-table'),
@@ -114,7 +115,6 @@ patterns_workout = [
         name='timer'),
 ]
 
-
 # sub patterns for workout sessions
 patterns_session = [
     url(r'^(?P<workout_pk>\d+)/add/(?P<year>\d{4})-(?P<month>\d{1,2})-(?P<day>\d{1,2})$',
@@ -127,7 +127,6 @@ patterns_session = [
         workout_session.WorkoutSessionDeleteView.as_view(),
         name='delete'),
 ]
-
 
 # sub patterns for workout days
 patterns_day = [
@@ -163,7 +162,6 @@ patterns_set = [
         set.edit,
         name='edit'),
 ]
-
 
 # sub patterns for schedules
 patterns_schedule = [
@@ -220,7 +218,6 @@ patterns_schedule = [
         name='pdf-table'),
 ]
 
-
 # sub patterns for schedule steps
 patterns_step = [
     url(r'^(?P<schedule_pk>\d+)/step/add$',
@@ -235,13 +232,12 @@ patterns_step = [
 ]
 
 
-
 urlpatterns = [
-   url(r'^', include(patterns_workout, namespace="workout")),
-   url(r'^log/', include(patterns_log, namespace="log")),
-   url(r'^day/', include(patterns_day, namespace="day")),
-   url(r'^set/', include(patterns_set, namespace="set")),
-   url(r'^session/', include(patterns_session, namespace="session")),
-   url(r'^schedule/', include(patterns_schedule, namespace="schedule")),
-   url(r'^schedule/step/', include(patterns_step, namespace="step")),
+    url(r'^', include(patterns_workout, namespace="workout")),
+    url(r'^log/', include(patterns_log, namespace="log")),
+    url(r'^day/', include(patterns_day, namespace="day")),
+    url(r'^set/', include(patterns_set, namespace="set")),
+    url(r'^session/', include(patterns_session, namespace="session")),
+    url(r'^schedule/', include(patterns_schedule, namespace="schedule")),
+    url(r'^schedule/step/', include(patterns_step, namespace="step")),
 ]

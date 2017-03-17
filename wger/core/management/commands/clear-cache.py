@@ -31,9 +31,9 @@ from wger.utils.cache import (
 
 
 class Command(BaseCommand):
-    '''
+    """
     Clears caches (HTML, etc.)
-    '''
+    """
 
     option_list = BaseCommand.option_list + (
         make_option('--clear-template',
@@ -59,9 +59,9 @@ class Command(BaseCommand):
            'what exactly you want to clear. See available options.'
 
     def handle(self, **options):
-        '''
+        """
         Process the options
-        '''
+        """
 
         if (not options['clear_template']
                 and not options['clear_workout']

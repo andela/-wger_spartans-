@@ -41,9 +41,9 @@ class ExerciseCommentEditView(WgerFormMixin,
                               LoginRequiredMixin,
                               PermissionRequiredMixin,
                               UpdateView):
-    '''
+    """
     Generic view to update an existing exercise comment
-    '''
+    """
 
     model = ExerciseComment
     form_class = CommentForm
@@ -66,9 +66,9 @@ class ExerciseCommentAddView(WgerFormMixin,
                              LoginRequiredMixin,
                              PermissionRequiredMixin,
                              CreateView):
-    '''
+    """
     Generic view to add a new exercise comment
-    '''
+    """
 
     model = ExerciseComment
     form_class = CommentForm
@@ -83,9 +83,9 @@ class ExerciseCommentAddView(WgerFormMixin,
         return reverse('exercise:exercise:view', kwargs={'id': self.object.exercise.id})
 
     def get_context_data(self, **kwargs):
-        '''
+        """
         Send some additional data to the template
-        '''
+        """
         context = super(ExerciseCommentAddView, self).get_context_data(**kwargs)
         context['form_action'] = reverse('exercise:comment:add',
                                          kwargs={'exercise_pk': self.kwargs['exercise_pk']})

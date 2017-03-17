@@ -22,14 +22,14 @@ from wger.weight.models import WeightEntry
 
 
 class DashboardTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Dashboard (landing page) test case
-    '''
+    """
 
     def dashboard(self):
-        '''
+        """
         Helper function to test the dashboard
-        '''
+        """
 
         response = self.client.get(reverse('core:index'))
 
@@ -88,9 +88,9 @@ class DashboardTestCase(WorkoutManagerTestCase):
         self.assertTrue(response.context['weekdays'])
 
     def test_dashboard_logged_in(self):
-        '''
+        """
         Test index page as a logged in user
-        '''
+        """
 
         self.user_login('admin')
         self.dashboard()

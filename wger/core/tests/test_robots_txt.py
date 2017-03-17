@@ -20,9 +20,9 @@ from wger.core.tests.base_testcase import WorkoutManagerTestCase
 
 
 class RobotsTxtTestCase(WorkoutManagerTestCase):
-    '''
+    """
     Tests the generated robots.txt
-    '''
+    """
 
     def test_robots(self):
 
