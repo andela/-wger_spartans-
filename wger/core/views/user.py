@@ -505,6 +505,7 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         context['contracts'] = Contract.objects.filter(member=self.object)[:5]
         return context
 
+
 @login_required
 def sync_fitbit_weight(request):
         """  fitbit integration to retrieve weight """
@@ -544,6 +545,7 @@ def sync_fitbit_weight(request):
                 return render(request, 'user/fitbit.html', template)
 
         return render(request, 'user/fitbit.html', template)
+
 
 @login_required
 def sync_fitbit_activity(request):
@@ -611,6 +613,7 @@ def sync_fitbit_activity(request):
 
     return render(request, 'user/fitbit_weight.html', template)
 
+
 @login_required
 def sync_fitbit_ingredients(request):
     """  fitbit integration to retrieve frequent activities """
@@ -668,6 +671,7 @@ def sync_fitbit_ingredients(request):
         else:
             messages.warning(request, _('Could not get food log details'))
     return render(request, 'user/fitbit_ingredients.html', template)
+
 
 @login_required
 def fitbit_authorization(request, callback):
