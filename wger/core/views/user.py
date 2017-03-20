@@ -505,7 +505,7 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         context['contracts'] = Contract.objects.filter(member=self.object)[:5]
         return context
 
-    @login_required()
+    @login_required
     def sync_fitbit_weight(request):
             """  fitbit integration to retrieve weight """
             code = None
@@ -561,7 +561,7 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                     messages.warning(request, _("Something went wrong, please try again later"))
             return render(request, 'user/fitbit.html', template)
 
-    @login_required()
+    @login_required
     def sync_fitbit_activity(request):
         """  fitbit integration to retrieve frequent activities """
         code = None
@@ -586,62 +586,60 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                                             access_token=token["access_token"],
                                             refresh_token=token["refresh_token"], system="en_UK")
                     response = fitbit_request.activities_list()
-                    full_data = []
+                    activities = []
 
                     for category in response['categories']:
-                        exercise_categories = dict()
-                        exercise_categories['category_name'] = category.get('name')
-                        activities = []
                         for item in category.get('activities'):
                             activities.append(item.get('name'))
 
-                        exercise_categories['exercise'] = activities
-
-                        full_data.append(exercise_categories)
-
                     # save data to db
                     try:
-                        for category in full_data:
+                        if not activities:
+                            messages.info(request, _('Sorry no activity logged on Fitbit today'))
+                            return HttpResponseRedirect(
+                                reverse('exercise:exercise:overview'))
 
-                            if not ExerciseCategory.objects.filter(name=category.get('category_name'
-                                                                                     )).exists():
-                                exercise_category = ExerciseCategory()
-                                exercise_category.name = category.get('category_name')
-                                exercise_category.save()
+                        if not ExerciseCategory.objects.filter(name='Fitbit').exists():
+                            exercise_category = ExerciseCategory()
+                            exercise_category.name = 'Fitbit'
+                            exercise_category.save()
 
-                            for name in category.get('exercise'):
-                                name_original = smart_capitalize(name)
-                                exercise = Exercise()
-                                if not Exercise.objects.filter(name=name_original).exists():
-                                    exercise.name_original = name
-                                    exercise.description = name_original
-                                    if not Language.objects.filter(short_name='en').exists():
-                                        exercise.language = Language(short_name='en',
-                                                                     full_name='English')
-                                    else:
-                                        exercise.language = Language.objects.get(short_name='en')
-                                    if not License.objects.filter(short_name='Apache').exists():
-                                        exercise.license = License(short_name="Apache",
-                                                                   full_name='Apache License '
-                                                                             'Version'
-                                                                             '2.0,January 2004',
-                                                                   url='http://www.apache.org/'
-                                                                       'licenses/LICENSE-2.0')
-                                    else:
-                                        exercise.license = License.objects.get(short_name='Apache')
-                                    exercise.category = ExerciseCategory.objects.get(
-                                        name=category.get('category_name'))
-                                    exercise.set_author(request)
-                                    exercise.save()
+                        for name in activities:
+                            name_original = smart_capitalize(name)
+                            exercise = Exercise()
+                            if not Exercise.objects.filter(name=name_original).exists():
+                                exercise.name_original = name
+                                exercise.description = name_original
+                                if not Language.objects.filter(short_name='en').exists():
+                                    exercise.language = Language(short_name='en',
+                                                                 full_name='English')
+                                else:
+                                    exercise.language = Language.objects.get(short_name='en')
+                                if not License.objects.filter(short_name='Apache').exists():
+                                    exercise.license = License(short_name="Apache",
+                                                               full_name='Apache License '
+                                                                         'Version'
+                                                                         '2.0,January 2004',
+                                                               url='http://www.apache.org/'
+                                                                   'licenses/LICENSE-2.0')
+                                else:
+                                    exercise.license = License.objects.get(short_name='Apache')
+                                exercise.category = ExerciseCategory.objects.get(
+                                    name='Fitbit')
+                                exercise.set_author(request)
+                                exercise.save()
                         messages.success(request, _('Successfully synced exercise data.'))
+                        # redirect to exercise overview page if operations successful
+                        return HttpResponseRedirect(
+                            reverse('exercise:exercise:overview'))
+
                     except IntegrityError as e:
 
                         if "UNIQUE constraint failed" in str(e):
                             messages.info(request, _('Already synced up exercises for today.'))
 
-                            # redirect to exercise overview page if operations successful
                             return HttpResponseRedirect(
-                                reverse('exercise:overview'))
+                                reverse('exercise:exercise:overview'))
                         else:
                             messages.warning(request, _("Something went wrong"))
 
@@ -653,7 +651,7 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
 
         return render(request, 'user/fitbit_weight.html', template)
 
-    @login_required()
+    @login_required
     def sync_fitbit_ingredients(request):
         """  fitbit integration to retrieve frequent activities """
         code = None
@@ -687,7 +685,8 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
 
                 for item in food_collection['foods']:
                     logged_food_names = item.get('loggedFood').get('name')
-                    messages.success(request, _('Food names = ') + str(logged_food_names))
+                    lang = item.get('loggedFood').get('locale')
+                    messages.info(request, _('lanuage =') + str(lang))
                     nutrition_values = item.get('nutritionalValues')
                     if nutrition_values:
                         calories = nutrition_values.get('calories', 0)
@@ -718,11 +717,18 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
                                 new_ingredient.language = Language.objects.get(short_name='en')
 
                             new_ingredient.save()
-                            messages.success(request, _('Food details = ')
-                                             + str('Food_name = {}''Carbs = {},fat = {}, '
-                                                   'fiber = {},  protein ={}, sodium  ={}'
-                                                   .format(logged_food_names, carbs, fat, fiber,
-                                                           protein, sodium)))
+                            # messages.success(request, _('Food details = ')
+                            #                  + str('Food_name = {}''Carbs = {},fat = {}, '
+                            #                        'fiber = {},  protein ={}, sodium  ={}'
+                            #                        .format(logged_food_names, carbs, fat, fiber,
+                            #                                protein, sodium)))
+                            messages.success(request, _('Successfully synced your Food Logs'))
+                            return HttpResponseRedirect(
+                                reverse('nutrition:ingredient:list'))
+                        else:
+                            messages.info(request, _('Already synced up exercises for today.'))
+                            return HttpResponseRedirect(
+                                reverse('nutrition:ingredient:list'))
                     except BaseException as e:
                         messages.warning(request, _('Something went wrong ') + str(e))
             else:
