@@ -20,6 +20,11 @@ from wger.core.tests.base_testcase import (
     WorkoutManagerEditTestCase,
     WorkoutManagerAccessTestCase
 )
+from unittest.mock import patch
+from wger.core.views.user import UserDetailView
+from fitbit import FitbitOauth2Client, Fitbit
+import requests
+
 
 
 class StatusUserTestCase(WorkoutManagerTestCase):
@@ -226,3 +231,12 @@ class UserDetailPageTestCase2(WorkoutManagerAccessTestCase):
                  'manager1',
                  'member1',
                  'member2')
+
+
+class UserDetailViewFitbitSyncTestCase(WorkoutManagerAccessTestCase):
+    client_id = 'fake-client-id'
+    client_secret = 'fake-client-secret'
+
+    with patch.object(FitbitOauth2Client(client_id, client_secret)) as fitbitclient:
+        UserDetailView.sync_fitbit_weight()
+
