@@ -505,235 +505,202 @@ class UserDetailView(LoginRequiredMixin, WgerMultiplePermissionRequiredMixin, De
         context['contracts'] = Contract.objects.filter(member=self.object)[:5]
         return context
 
-    @login_required
-    def sync_fitbit_weight(request):
-            """  fitbit integration to retrieve weight """
-            code = None
-            client_id = settings.WGER_SETTINGS['FITBIT_CLIENT_ID']
-            client_secret = settings.WGER_SETTINGS['FITBIT_CLIENT_SECRET']
-            call_back = settings.SITE_URL + reverse('core:user:fitbit')
-            fitbit_client = FitbitOauth2Client(client_id, client_secret)
-            url = fitbit_client.authorize_token_url(redirect_uri=call_back)
+@login_required
+def sync_fitbit_weight(request):
+        """  fitbit integration to retrieve weight """
 
-            template = {"fitbit_url": url[0]}
+        call_back = settings.SITE_URL + reverse('core:user:fitbit')
+        template = fitbit_authorization(request, call_back)
 
-            # retrieve the code from the redirect URL
+        if "code" in request.GET:
+            token_code = request.GET["code"]
+            user_prof = fitbit_get_data(token_code, call_back, action='weight')
 
-            if "code" in request.GET:
-                token_code = request.GET["code"]
-            # use fitbit library to get access token an retrieve weight
+            weight = user_prof["user"]["weight"]
+            # add the user weight to the database
+            # initialise the weight entry class for saving to DB
+
+            try:
+                fetched_weight = WeightEntry()
+                fetched_weight.weight = weight
+                fetched_weight.user = request.user
+                fetched_weight.date = datetime.date.today()
+                fetched_weight.save()
+                messages.success(request, _('Successfully synced weight data.'))
+                return HttpResponseRedirect(
+                    reverse('weight:overview', kwargs={
+                        'username': request.user.username}))
+            except IntegrityError as e:
+
+                if "UNIQUE CONSTRAINT" in str(e).upper():
+                    messages.info(request, _('Already synced up for today.'))
+                    # redirect to weight overview page if operations successful
+                    return HttpResponseRedirect(
+                        reverse('weight:overview', kwargs={
+                            'username': request.user.username}))
+
+                messages.warning(request, _("Something went wrong") + str(e))
+
+                return render(request, 'user/fitbit.html', template)
+
+        return render(request, 'user/fitbit.html', template)
+
+@login_required
+def sync_fitbit_activity(request):
+    """  fitbit integration to retrieve frequent activities """
+
+    call_back = settings.SITE_URL + reverse('core:user:fitbit-activity')
+    template = fitbit_authorization(request, call_back)
+    if "code" in request.GET:
+        token_code = request.GET["code"]
+        response = fitbit_get_data(token_code, call_back, action='exercise')
+
+        activities = []
+        for category in response['categories']:
+            for item in category.get('activities'):
+                activities.append(item.get('name'))
+
+        # save data to db
+        try:
+            if not activities:
+                messages.info(request, _('Sorry no activity logged on Fitbit today'))
+                return HttpResponseRedirect(
+                    reverse('exercise:exercise:overview'))
+
+            if not ExerciseCategory.objects.filter(name='Fitbit').exists():
+                exercise_category = ExerciseCategory()
+                exercise_category.name = 'Fitbit'
+                exercise_category.save()
+
+            for name in activities:
+                name_original = smart_capitalize(name)
+                exercise = Exercise()
+                if not Exercise.objects.filter(name=name_original).exists():
+                    exercise.name_original = name
+                    exercise.description = name_original
+                    if not Language.objects.filter(short_name='en').exists():
+                        exercise.language = Language(short_name='en',
+                                                     full_name='English')
+                    else:
+                        exercise.language = Language.objects.get(short_name='en')
+                    if not License.objects.filter(short_name='Apache').exists():
+                        exercise.license = License(short_name="Apache",
+                                                   full_name='Apache License '
+                                                             'Version'
+                                                             '2.0,January 2004',
+                                                   url='http://www.apache.org/'
+                                                       'licenses/LICENSE-2.0')
+                    else:
+                        exercise.license = License.objects.get(short_name='Apache')
+                    exercise.category = ExerciseCategory.objects.get(
+                        name='Fitbit')
+                    exercise.set_author(request)
+                    exercise.save()
+                    messages.success(request, _('Successfully synced exercise data.'))
+                    return HttpResponseRedirect(
+                        reverse('exercise:exercise:overview'))
+                else:
+                    messages.info(request, _('Already synced up exercises for today.'))
+
+                    return HttpResponseRedirect(
+                        reverse('exercise:exercise:overview'))
+
+        except BaseException as e:
+            messages.warning(request, _("Something went wrong") + str(e))
+            return render(request, 'user/fitbit_weight.html', template)
+
+    return render(request, 'user/fitbit_weight.html', template)
+
+@login_required
+def sync_fitbit_ingredients(request):
+    """  fitbit integration to retrieve frequent activities """
+
+    call_back = settings.SITE_URL + reverse('core:user:fitbit-ingredients')
+    template = fitbit_authorization(request, call_back)
+    if "code" in request.GET:
+        token_code = request.GET["code"]
+        food_collection = fitbit_get_data(token_code, call_back, action='food_log')
+
+        if food_collection:
+
+            for item in food_collection['foods']:
+                logged_food_names = item.get('loggedFood').get('name')
+                lang = item.get('loggedFood').get('locale')
+                nutrition_values = item.get('nutritionalValues')
+                if nutrition_values:
+                    calories = nutrition_values.get('calories', 0)
+                    carbs = nutrition_values.get('carbs', 0)
+                    fat = nutrition_values.get('fat', 0)
+                    fiber = nutrition_values.get('fiber', 0)
+                    protein = nutrition_values.get('protein', 0)
+                    sodium = nutrition_values.get('sodium', 0)
+
+                else:
+                    calories, carbs, fat, fiber, protein, sodium = [0, 0, 0, 0, 0, 0]
 
                 try:
-                    token = fitbit_client.fetch_access_token(token_code)
-                    if "access_token" in token:
-                        fit_req = Fitbit(client_id=client_id, client_secret=client_secret,
-                                         access_token=token["access_token"],
-                                         refresh_token=token["refresh_token"],
-                                         system="en_UK")
-                        user_prof = fit_req.user_profile_get()
-                        weight = user_prof["user"]["weight"]
-                        # add the user weight to the database
-                        # initialise the weight entry class for saving to DB
-
-                    try:
-                        fetched_weight = WeightEntry()
-                        fetched_weight.weight = weight
-                        fetched_weight.user = request.user
-                        fetched_weight.date = datetime.date.today()
-                        fetched_weight.save()
-                        messages.success(request, _('Successfully synced weight data.'))
-                        return HttpResponseRedirect(
-                            reverse('weight:overview', kwargs={
-                                'username': request.user.username}))
-                    except IntegrityError as e:
-
-                        if "UNIQUE CONSTRAINT" in str(e).upper():
-                            messages.info(request, _('Already synced up for today.'))
-                            # redirect to weight overview page if operations successful
-                            return HttpResponseRedirect(
-                                reverse('weight:overview', kwargs={
-                                    'username': request.user.username}))
-
-                        messages.warning(request, _("Something went wrong") + str(e))
-
-                        return render(request, 'user/fitbit.html', template)
-                except:
-                    messages.warning(request, _("Something went wrong, please try again later"))
-            return render(request, 'user/fitbit.html', template)
-
-    @login_required
-    def sync_fitbit_activity(request):
-        """  fitbit integration to retrieve frequent activities """
-        code = None
-        client_id = settings.WGER_SETTINGS['FITBIT_CLIENT_ID']
-        client_secret = settings.WGER_SETTINGS['FITBIT_CLIENT_SECRET']
-        call_back = settings.SITE_URL + reverse('core:user:fitbit-activity')
-        fitbit_client = FitbitOauth2Client(client_id, client_secret)
-        url = fitbit_client.authorize_token_url(redirect_uri=call_back)
-
-        template = {"fitbit_url": url[0]}
-
-        # retrieve the code from the redirect URL
-
-        if "code" in request.GET:
-            token_code = request.GET["code"]
-            # use fitbit library to get access token an retrieve data
-
-            try:
-                token = fitbit_client.fetch_access_token(token_code)
-                if "access_token" in token:
-                    fitbit_request = Fitbit(client_id=client_id, client_secret=client_secret,
-                                            access_token=token["access_token"],
-                                            refresh_token=token["refresh_token"], system="en_UK")
-                    response = fitbit_request.activities_list()
-                    activities = []
-
-                    for category in response['categories']:
-                        for item in category.get('activities'):
-                            activities.append(item.get('name'))
-
-                    # save data to db
-                    try:
-                        if not activities:
-                            messages.info(request, _('Sorry no activity logged on Fitbit today'))
-                            return HttpResponseRedirect(
-                                reverse('exercise:exercise:overview'))
-
-                        if not ExerciseCategory.objects.filter(name='Fitbit').exists():
-                            exercise_category = ExerciseCategory()
-                            exercise_category.name = 'Fitbit'
-                            exercise_category.save()
-
-                        for name in activities:
-                            name_original = smart_capitalize(name)
-                            exercise = Exercise()
-                            if not Exercise.objects.filter(name=name_original).exists():
-                                exercise.name_original = name
-                                exercise.description = name_original
-                                if not Language.objects.filter(short_name='en').exists():
-                                    exercise.language = Language(short_name='en',
-                                                                 full_name='English')
-                                else:
-                                    exercise.language = Language.objects.get(short_name='en')
-                                if not License.objects.filter(short_name='Apache').exists():
-                                    exercise.license = License(short_name="Apache",
-                                                               full_name='Apache License '
-                                                                         'Version'
-                                                                         '2.0,January 2004',
-                                                               url='http://www.apache.org/'
-                                                                   'licenses/LICENSE-2.0')
-                                else:
-                                    exercise.license = License.objects.get(short_name='Apache')
-                                exercise.category = ExerciseCategory.objects.get(
-                                    name='Fitbit')
-                                exercise.set_author(request)
-                                exercise.save()
-                        messages.success(request, _('Successfully synced exercise data.'))
-                        # redirect to exercise overview page if operations successful
-                        return HttpResponseRedirect(
-                            reverse('exercise:exercise:overview'))
-
-                    except IntegrityError as e:
-
-                        if "UNIQUE constraint failed" in str(e):
-                            messages.info(request, _('Already synced up exercises for today.'))
-
-                            return HttpResponseRedirect(
-                                reverse('exercise:exercise:overview'))
+                    new_ingredient = Ingredient()
+                    if not Ingredient.objects.filter(name=logged_food_names).exists():
+                        new_ingredient.user = request.user
+                        new_ingredient.name = logged_food_names
+                        new_ingredient.carbohydrates = carbs
+                        new_ingredient.fat = fat
+                        new_ingredient.fibres = fiber
+                        new_ingredient.protein = protein
+                        new_ingredient.sodium = sodium
+                        new_ingredient.energy = calories
+                        if not Language.objects.filter(short_name='en').exists():
+                            new_ingredient.language = Language(short_name='en',
+                                                               full_name='English')
                         else:
-                            messages.warning(request, _("Something went wrong"))
+                            new_ingredient.language = Language.objects.get(short_name='en')
 
-                            return render(request, 'user/fitbit_weight.html', template)
-            except BaseException as e:
-                logger.exception('Failed: ' + str(e))
-                messages.warning(request, _("Something went wrong, please try again later") +
-                                 str(e))
-
-        return render(request, 'user/fitbit_weight.html', template)
-
-    @login_required
-    def sync_fitbit_ingredients(request):
-        """  fitbit integration to retrieve frequent activities """
-        code = None
-        client_id = settings.WGER_SETTINGS['FITBIT_CLIENT_ID']
-        client_secret = settings.WGER_SETTINGS['FITBIT_CLIENT_SECRET']
-        call_back = settings.SITE_URL + reverse('core:user:fitbit-ingredients')
-        fitbit_client = FitbitOauth2Client(client_id, client_secret)
-        url = fitbit_client.authorize_token_url(redirect_uri=call_back)
-
-        template = {"fitbit_url": url[0]}
-
-        # retrieve the code from the redirect URL
-
-        if "code" in request.GET:
-            token_code = request.GET["code"]
-            # use fitbit library to get access token an retrieve data
-
-            food_collection = None
-            try:
-                token = fitbit_client.fetch_access_token(token_code)
-                if "access_token" in token:
-                    fitbit_request = Fitbit(client_id=client_id, client_secret=client_secret,
-                                            access_token=token["access_token"],
-                                            refresh_token=token["refresh_token"], system="en_UK")
-
-                    food_collection = fitbit_request._COLLECTION_RESOURCE('foods/log')
-            except BaseException as e:
-                messages.warning(request, _('Something went wrong. \n') + str(e))
-
-            if food_collection:
-
-                for item in food_collection['foods']:
-                    logged_food_names = item.get('loggedFood').get('name')
-                    lang = item.get('loggedFood').get('locale')
-                    messages.info(request, _('lanuage =') + str(lang))
-                    nutrition_values = item.get('nutritionalValues')
-                    if nutrition_values:
-                        calories = nutrition_values.get('calories', 0)
-                        carbs = nutrition_values.get('carbs', 0)
-                        fat = nutrition_values.get('fat', 0)
-                        fiber = nutrition_values.get('fiber', 0)
-                        protein = nutrition_values.get('protein', 0)
-                        sodium = nutrition_values.get('sodium', 0)
-
+                        new_ingredient.save()
+                        messages.success(request, _('Successfully synced your Food Logs'))
+                        return HttpResponseRedirect(
+                            reverse('nutrition:ingredient:list'))
                     else:
-                        calories, carbs, fat, fiber, protein, sodium = [0, 0, 0, 0, 0, 0]
+                        messages.info(request, _('Already synced up Ingredients for today.'))
+                        return HttpResponseRedirect(
+                            reverse('nutrition:ingredient:list'))
+                except BaseException as e:
+                    messages.warning(request, _('Something went wrong ') + str(e))
+        else:
+            messages.warning(request, _('Could not get food log details'))
+    return render(request, 'user/fitbit_ingredients.html', template)
 
-                    try:
-                        new_ingredient = Ingredient()
-                        if not Ingredient.objects.filter(name=logged_food_names).exists():
-                            new_ingredient.user = request.user
-                            new_ingredient.name = logged_food_names
-                            new_ingredient.carbohydrates = carbs
-                            new_ingredient.fat = fat
-                            new_ingredient.fibres = fiber
-                            new_ingredient.protein = protein
-                            new_ingredient.sodium = sodium
-                            new_ingredient.energy = calories
-                            if not Language.objects.filter(short_name='en').exists():
-                                new_ingredient.language = Language(short_name='en',
-                                                                   full_name='English')
-                            else:
-                                new_ingredient.language = Language.objects.get(short_name='en')
+@login_required
+def fitbit_authorization(request, callback):
+    code = None
+    client_id = settings.WGER_SETTINGS['FITBIT_CLIENT_ID']
+    client_secret = settings.WGER_SETTINGS['FITBIT_CLIENT_SECRET']
+    call_back = callback
+    fitbit_client = FitbitOauth2Client(client_id, client_secret)
+    url = fitbit_client.authorize_token_url(redirect_uri=call_back)
 
-                            new_ingredient.save()
-                            # messages.success(request, _('Food details = ')
-                            #                  + str('Food_name = {}''Carbs = {},fat = {}, '
-                            #                        'fiber = {},  protein ={}, sodium  ={}'
-                            #                        .format(logged_food_names, carbs, fat, fiber,
-                            #                                protein, sodium)))
-                            messages.success(request, _('Successfully synced your Food Logs'))
-                            return HttpResponseRedirect(
-                                reverse('nutrition:ingredient:list'))
-                        else:
-                            messages.info(request, _('Already synced up exercises for today.'))
-                            return HttpResponseRedirect(
-                                reverse('nutrition:ingredient:list'))
-                    except BaseException as e:
-                        messages.warning(request, _('Something went wrong ') + str(e))
-            else:
-                messages.warning(request, _('Could not get food details'))
-        return render(request, 'user/fitbit_ingredients.html', template)
+    template = {"fitbit_url": url[0]}
+    return template
+
+
+def fitbit_get_data(code, callback, action=None):
+    try:
+        client_id = settings.WGER_SETTINGS['FITBIT_CLIENT_ID']
+        client_secret = settings.WGER_SETTINGS['FITBIT_CLIENT_SECRET']
+        fitbit_client = FitbitOauth2Client(client_id, client_secret)
+        call_back = callback
+        token = fitbit_client.fetch_access_token(code, redirect_uri=call_back)
+        if "access_token" in token:
+            fitbit_request = Fitbit(client_id=client_id, client_secret=client_secret,
+                                    access_token=token["access_token"],
+                                    refresh_token=token["refresh_token"], system="en_UK")
+            if action == 'weight':
+                return fitbit_request.user_profile_get()
+            elif action == 'exercise':
+                return fitbit_request.activities_list()
+            elif action == 'food_log':
+                return fitbit_request._COLLECTION_RESOURCE('foods/log')
+    except BaseException as e:
+        return str(e)
 
 
 class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
