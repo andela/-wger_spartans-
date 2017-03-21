@@ -228,7 +228,6 @@ class GetAllExerciseInfo(WorkoutManagerTestCase, ApiGetTestCase, ApiBaseTestCase
         resource = Exercise
 
 
-
 class ExercisesTestCase(WorkoutManagerTestCase):
     """
     Exercise test case
