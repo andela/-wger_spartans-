@@ -220,12 +220,13 @@ class ExerciseDetailTestCase(WorkoutManagerTestCase):
         self.exercise_detail(editor=False)
 
 
-class GetAllExerciseInfo(WorkoutManagerTestCase, ApiGetTestCase, ApiBaseTestCase):
-    def test_get_all_exercise_information(self):
+class GetAllExerciseInfo(WorkoutManagerTestCase):
+    def test_get_all_exercise_info(self):
 
-        url = '/api/v2/exercise-info/'
+        # url = '/api/v2/exercise-info/'
         url_detail = '/api/v2/exercise-info/1/'
-        resource = Exercise
+        response = self.client.get(url_detail)
+        self.assertEqual(response.status_code, 200)
 
 
 class ExercisesTestCase(WorkoutManagerTestCase):
