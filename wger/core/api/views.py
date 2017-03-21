@@ -51,6 +51,8 @@ from rest_framework.response import Response
 from django.contrib.auth.hashers import make_password
 from rest_framework import serializers
 from wger.config.models import GymConfig
+from wger.gym.models import Gym
+from wger.gym.models import GymUserConfig
 
 
 class RegisterUserViewSet(viewsets.ModelViewSet):
@@ -85,8 +87,14 @@ class RegisterUserViewSet(viewsets.ModelViewSet):
         language = Language.objects.get(short_name=translation.get_language())
         user.userprofile.notification_language = language
 
+        # Default gym
+        gym = Gym.objects.get(pk=1)
+
         # Sets default gym, if needed
         gym_config = GymConfig.objects.get(pk=1)
+
+        gym_config.default_gym = gym
+
         if gym_config.default_gym:
             user.userprofile.gym = gym_config.default_gym
 
