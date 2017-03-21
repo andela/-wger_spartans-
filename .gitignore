@@ -61,4 +61,6 @@ target/
 
 # External Libraries
 wger/core/static/bower_components
+wger/settings.py
+manage.py
 node_modules
