@@ -223,10 +223,10 @@ class ExerciseDetailTestCase(WorkoutManagerTestCase):
 class GetAllExerciseInfo(WorkoutManagerTestCase, ApiGetTestCase, ApiBaseTestCase):
     def test_get_all_exercise_info(self):
 
-        url = '/api/v2/exercise-info'
-        url_detail = '/api/v2/exercise-info'
+        url = '/api/v2/exercise-info/'
+        url_detail = '/api/v2/exercise-info/1/'
         resource = Exercise
-        pk = 1
+
 
 
 class ExercisesTestCase(WorkoutManagerTestCase):
