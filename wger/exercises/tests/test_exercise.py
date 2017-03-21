@@ -221,7 +221,7 @@ class ExerciseDetailTestCase(WorkoutManagerTestCase):
 
 
 class GetAllExerciseInfo(WorkoutManagerTestCase, ApiGetTestCase, ApiBaseTestCase):
-    def test_get_all_exercise_info(self):
+    def test_get_all_exercise_information(self):
 
         url = '/api/v2/exercise-info/'
         url_detail = '/api/v2/exercise-info/1/'
