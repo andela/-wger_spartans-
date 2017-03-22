@@ -124,12 +124,14 @@ class WeightUnitViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = '__all__'
     filter_fields = ('name', )
 
+
 class UserRegistration(viewsets.ModelViewSet):
-   
+
     serializer_class = UserRegistrationSerializer
 
+
 class AllUserInfo(viewsets.ModelViewSet):
-   
+
     queryset = User.objects.all()
     serializer_class = AllUserInfoSerializer
     ordering_fields = '__all__'
