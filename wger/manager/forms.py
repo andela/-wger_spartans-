@@ -35,7 +35,7 @@ from django.forms import (
 
 from wger.core.models import (
     RepetitionUnit,
-    WeightUnit
+    WeightUnit,
 )
 from wger.exercises.models import (
     Exercise,
@@ -99,6 +99,21 @@ class SetForm(ModelForm):
         super(SetForm, self).__init__(*args, **kwargs)
         self.fields['exercises'].help_text = _('You can search for more than one exercise, '
                                                'they will be grouped together for a superset.')
+
+
+class DropsetForm(ModelForm):
+    class Meta:
+        model = Set
+        exclude = ('order', 'exerciseday')
+        widgets = {'exercises': ExerciseAjaxSelect(), }
+
+    def __init__(self, *args, **kwargs):
+        super(DropsetForm, self).__init__(*args, **kwargs)
+        self.fields['exercises'].help_text = _('You can search for more than one exercise, '
+                                               'they will be grouped together for a superset.')
+
+        self.fields['exercises'].queryset = Exercise.objects.filter(
+            equipment__name__in=['Kettlebell', 'Barbell', 'Dumbbell']).select_related()
 
 
 class SetFormMobile(ModelForm):
