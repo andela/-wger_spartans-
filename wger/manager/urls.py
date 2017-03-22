@@ -153,7 +153,7 @@ patterns_set = [
         set.create,
         name='add'),
     url(r'^day/(?P<day_pk>\d+)/set/dropset/$',
-        set.dropset,
+        set.create_dropset,
         name='dropset'),
     url(r'^get-formset/(?P<exercise_pk>\d+)/(?P<reps>\d+)/',
         set.get_formset,
