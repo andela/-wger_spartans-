@@ -219,7 +219,7 @@ class ExerciseDetailTestCase(WorkoutManagerTestCase):
 
         self.exercise_detail(editor=False)
 
-    
+
 class ExercisesTestCase(WorkoutManagerTestCase):
     """
     Exercise test case
