@@ -513,11 +513,15 @@ def sync_fitbit_weight(request):
         call_back = settings.SITE_URL + reverse('core:user:fitbit')
         template = fitbit_authorization(request, call_back)
 
+        # import pdb; pdb.set_trace()
+
         if "code" in request.GET:
             token_code = request.GET["code"]
             user_prof = fitbit_get_data(token_code, call_back, action='weight')
+            # import pdb;pdb.set_trace()
 
             weight = user_prof["user"]["weight"]
+            messages.info(request, _('Weight =') + str(weight))
             # add the user weight to the database
             # initialise the weight entry class for saving to DB
 
@@ -619,6 +623,7 @@ def sync_fitbit_ingredients(request):
     """  fitbit integration to retrieve frequent activities """
 
     call_back = settings.SITE_URL + reverse('core:user:fitbit-ingredients')
+    # settings.S
     template = fitbit_authorization(request, call_back)
     if "code" in request.GET:
         token_code = request.GET["code"]
@@ -680,7 +685,7 @@ def fitbit_authorization(request, callback):
     client_secret = settings.WGER_SETTINGS['FITBIT_CLIENT_SECRET']
     call_back = callback
     fitbit_client = FitbitOauth2Client(client_id, client_secret)
-    url = fitbit_client.authorize_token_url(redirect_uri=call_back)
+    url = fitbit_client.authorize_token_url(redirect_uri=call_back, prompt='login')
 
     template = {"fitbit_url": url[0]}
     return template
@@ -693,6 +698,7 @@ def fitbit_get_data(code, callback, action=None):
         fitbit_client = FitbitOauth2Client(client_id, client_secret)
         call_back = callback
         token = fitbit_client.fetch_access_token(code, redirect_uri=call_back)
+        # import pdb; pdb.set_trace()
         if "access_token" in token:
             fitbit_request = Fitbit(client_id=client_id, client_secret=client_secret,
                                     access_token=token["access_token"],
