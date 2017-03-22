@@ -21,10 +21,17 @@ from wger.core.tests.base_testcase import (
     WorkoutManagerAccessTestCase
 )
 from unittest.mock import patch
-from wger.core.views.user import UserDetailView
-from fitbit import FitbitOauth2Client, Fitbit
-import requests
-
+import os
+from wger.weight.models import WeightEntry
+from django.contrib.auth.models import User
+import datetime
+from django.db import IntegrityError
+from django.db import transaction
+from wger.nutrition.models import Ingredient
+from wger.exercises.models import (
+    Exercise,
+    ExerciseCategory,
+)
 
 
 class StatusUserTestCase(WorkoutManagerTestCase):
@@ -233,10 +240,96 @@ class UserDetailPageTestCase2(WorkoutManagerAccessTestCase):
                  'member2')
 
 
-class UserDetailViewFitbitSyncTestCase(WorkoutManagerAccessTestCase):
-    client_id = 'fake-client-id'
-    client_secret = 'fake-client-secret'
+class UserFitbitSyncTestCase(WorkoutManagerTestCase):
+    def setUp(self):
+        self.username = 'test'
+        self.password = 'testtest'
+        self.code = {'code': '80b5a817c2b1d8fb2081db8d31d870446828017'}
+        super().setUpClass()
 
-    with patch.object(FitbitOauth2Client(client_id, client_secret)) as fitbitclient:
-        UserDetailView.sync_fitbit_weight()
+    def tearDown(self):
+        super().tearDownClass()
 
+    def test_correct_template_used(self):
+        self.client.post(reverse('core:user:login'),
+                         data={'username': 'test', 'password': 'testtest'})
+        sync_weight_res = self.client.get(reverse('core:user:fitbit'))
+        self.assertTemplateUsed(sync_weight_res, 'user/fitbit.html')
+        sync_activity_res = self.client.get(reverse('core:user:fitbit-activity'))
+        self.assertTemplateUsed(sync_activity_res, 'user/fitbit_weight.html')
+        sync_food_res = self.client.get(reverse('core:user:fitbit-ingredients'))
+        self.assertTemplateUsed(sync_food_res, 'user/fitbit_ingredients.html')
+
+    @patch('wger.core.views.user.fitbit_get_data')
+    def test_sync_fitbit_weight(self, mock_fitbit_data):
+        weight_entry_count_before = WeightEntry.objects.count()
+        user_data = {"user": {"weight": 68}}
+        # with patch('wger.core.views.user.fitbit_get_data') as mock_fitbit_data:
+        mock_fitbit_data.return_value = user_data
+        self.client.post(reverse('core:user:login'),
+                         data={'username': self.username, 'password': self.password})
+        response = self.client.get(reverse('core:user:fitbit'),
+                                   data=self.code)
+
+        self.assertRedirects(response, reverse('weight:overview',
+                                               kwargs={'username': self.username}))
+        weight_entry_count_after = WeightEntry.objects.count()
+        self.assertEqual(weight_entry_count_after, weight_entry_count_before + 1)
+
+    # @patch('wger.core.views.user.fitbit_get_data')
+    # def test_duplicate_sync_fitbit_weight(self, mock_fitbit_data):
+    #     now = datetime.datetime.now()
+    #     today = now.strftime("%Y-%m-%d")
+    #     user = User.objects.get(username=self.username)
+    #     WeightEntry.objects.create(weight=68, user=user, date=today)
+    #     # import pdb; pdb.set_trace()
+    #     with transaction.atomic():
+    #         user_data = {"user": {"weight": 68}}
+    #         # with patch('wger.core.views.user.fitbit_get_data') as mock_fitbit_data:
+    #         mock_fitbit_data.return_value = user_data
+    #         self.client.post(reverse('core:user:login'),
+    #                          data={'username': self.username, 'password': self.password})
+    #         response = self.client.get(reverse('core:user:fitbit'),
+    #                                    data=self.code)
+    #
+    #         self.assertRedirects(response, reverse('weight:overview', kwargs={
+    #             'username': self.username}))
+    #
+    #         self.assertRaises(IntegrityError, response)
+
+    @patch('wger.core.views.user.fitbit_get_data')
+    def test_sync_fitbit_ingredients(self, mock_fitbit_data):
+        ingredient_count_before = Ingredient.objects.count()
+        data = {"foods": [{"loggedFood": {"name": "Croissant"},
+                           "nutritionalValues": {"calories": 293, "carbs": 30.86, "fat": 15.96,
+                                                 "fiber": 0.96, "protein": 5.19, "sodium": 235}}], }
+        mock_fitbit_data.return_value = data
+        self.client.post(reverse('core:user:login'),
+                         data={'username': self.username, 'password': self.password})
+        response = self.client.get(reverse('core:user:fitbit-ingredients'),
+                                   data=self.code)
+
+        self.assertRedirects(response, reverse('nutrition:ingredient:list'))
+        ingredient_count_after = Ingredient.objects.count()
+        self.assertEqual(ingredient_count_after, ingredient_count_before + 1)
+
+    # @patch('wger.core.views.user.fitbit_get_data')
+    # def test_sync_fitbit_activity(self, mock_fitbit_data):
+    #     exercise_count_before = Exercise.objects.count()
+    #     exercise_category_count_before = ExerciseCategory.objects.count()
+    #     exercises = {"categories": [{"activities": [
+    #         {"activityLevels": [{"name": "6 - 8 inch step"}, {"name": "10 - 12 inch step"}],
+    #          "name": "Aerobic step"}]}]}
+    #
+    #     mock_fitbit_data.return_value = exercises
+    #     self.client.post(reverse('core:user:login'),
+    #                      data={'username': self.username, 'password': self.password})
+    #     response = self.client.get(reverse('core:user:fitbit-activity'),
+    #                                data=self.code)
+    #
+    #     # self.assertRedirects(response, reverse('exercise:exercise:overview'))
+    #     exercise_count_after = Exercise.objects.count()
+    #     exercise_category_count_after = ExerciseCategory.objects.count()
+    #     self.assertEqual(exercise_count_after, exercise_count_before + 2)
+    #     self.assertEqual(exercise_category_count_after, exercise_category_count_before + 1)
+    #     self.assertIn('Fitbit', ExerciseCategory.objects.all())
