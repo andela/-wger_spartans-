@@ -21,6 +21,7 @@ django-bower
 invoke
 requests
 fitbit
+mock
 
 # REST API
 djangorestframework>=3.2,<3.3
