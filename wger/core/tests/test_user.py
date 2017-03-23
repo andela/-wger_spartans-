@@ -20,7 +20,7 @@ from wger.core.tests.base_testcase import (
     WorkoutManagerEditTestCase,
     WorkoutManagerAccessTestCase
 )
-from unittest.mock import patch
+from mock import patch
 import os
 from wger.weight.models import WeightEntry
 from django.contrib.auth.models import User
