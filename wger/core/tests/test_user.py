@@ -245,10 +245,10 @@ class UserFitbitSyncTestCase(WorkoutManagerTestCase):
         self.username = 'test'
         self.password = 'testtest'
         self.code = {'code': '80b5a817c2b1d8fb2081db8d31d870446828017'}
-        super().setUpClass()
+        os.environ['RECAPTCHA_TESTING'] = 'True'
 
     def tearDown(self):
-        super().tearDownClass()
+        del os.environ['RECAPTCHA_TESTING']
 
     def test_correct_template_used(self):
         self.client.post(reverse('core:user:login'),
