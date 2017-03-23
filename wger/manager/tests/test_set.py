@@ -180,7 +180,7 @@ class SetAddTestCase(WorkoutManagerAddTestCase):
                      'exercise2-3-repetition_unit': 2,
                      'exercise2-3-weight_unit': 2}
         response = self.client.post(reverse('manager:set:dropset', kwargs={'day_pk': 5}), post_data)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
 
 
 class SetDeleteTestCase(WorkoutManagerTestCase):
