@@ -27,6 +27,7 @@ from django.contrib.auth.models import User
 import datetime
 from django.db import IntegrityError
 from django.db import transaction
+import json
 from wger.nutrition.models import Ingredient
 from wger.exercises.models import (
     Exercise,
@@ -264,7 +265,6 @@ class UserFitbitSyncTestCase(WorkoutManagerTestCase):
     def test_sync_fitbit_weight(self, mock_fitbit_data):
         weight_entry_count_before = WeightEntry.objects.count()
         user_data = {"user": {"weight": 68}}
-        # with patch('wger.core.views.user.fitbit_get_data') as mock_fitbit_data:
         mock_fitbit_data.return_value = user_data
         self.client.post(reverse('core:user:login'),
                          data={'username': self.username, 'password': self.password})
@@ -276,60 +276,65 @@ class UserFitbitSyncTestCase(WorkoutManagerTestCase):
         weight_entry_count_after = WeightEntry.objects.count()
         self.assertEqual(weight_entry_count_after, weight_entry_count_before + 1)
 
-    # @patch('wger.core.views.user.fitbit_get_data')
-    # def test_duplicate_sync_fitbit_weight(self, mock_fitbit_data):
-    #     now = datetime.datetime.now()
-    #     today = now.strftime("%Y-%m-%d")
-    #     user = User.objects.get(username=self.username)
-    #     WeightEntry.objects.create(weight=68, user=user, date=today)
-    #     # import pdb; pdb.set_trace()
-    #     with transaction.atomic():
-    #         user_data = {"user": {"weight": 68}}
-    #         # with patch('wger.core.views.user.fitbit_get_data') as mock_fitbit_data:
-    #         mock_fitbit_data.return_value = user_data
-    #         self.client.post(reverse('core:user:login'),
-    #                          data={'username': self.username, 'password': self.password})
-    #         response = self.client.get(reverse('core:user:fitbit'),
-    #                                    data=self.code)
-    #
-    #         self.assertRedirects(response, reverse('weight:overview', kwargs={
-    #             'username': self.username}))
-    #
-    #         self.assertRaises(IntegrityError, response)
-
     @patch('wger.core.views.user.fitbit_get_data')
     def test_sync_fitbit_ingredients(self, mock_fitbit_data):
         ingredient_count_before = Ingredient.objects.count()
         data = {"foods": [{"loggedFood": {"name": "Croissant"},
                            "nutritionalValues": {"calories": 293, "carbs": 30.86, "fat": 15.96,
-                                                 "fiber": 0.96, "protein": 5.19, "sodium": 235}}], }
+                                                 "fiber": 0.96, "protein": 5.19, "sodium": 235}}]}
         mock_fitbit_data.return_value = data
         self.client.post(reverse('core:user:login'),
                          data={'username': self.username, 'password': self.password})
         response = self.client.get(reverse('core:user:fitbit-ingredients'),
-                                   data=self.code)
+                                   data=self.code, follow=True)
 
+        self.assertContains(response, 'Successfully synced your Food Log')
         self.assertRedirects(response, reverse('nutrition:ingredient:list'))
         ingredient_count_after = Ingredient.objects.count()
         self.assertEqual(ingredient_count_after, ingredient_count_before + 1)
 
-    # @patch('wger.core.views.user.fitbit_get_data')
-    # def test_sync_fitbit_activity(self, mock_fitbit_data):
-    #     exercise_count_before = Exercise.objects.count()
-    #     exercise_category_count_before = ExerciseCategory.objects.count()
-    #     exercises = {"categories": [{"activities": [
-    #         {"activityLevels": [{"name": "6 - 8 inch step"}, {"name": "10 - 12 inch step"}],
-    #          "name": "Aerobic step"}]}]}
-    #
-    #     mock_fitbit_data.return_value = exercises
-    #     self.client.post(reverse('core:user:login'),
-    #                      data={'username': self.username, 'password': self.password})
-    #     response = self.client.get(reverse('core:user:fitbit-activity'),
-    #                                data=self.code)
-    #
-    #     # self.assertRedirects(response, reverse('exercise:exercise:overview'))
-    #     exercise_count_after = Exercise.objects.count()
-    #     exercise_category_count_after = ExerciseCategory.objects.count()
-    #     self.assertEqual(exercise_count_after, exercise_count_before + 2)
-    #     self.assertEqual(exercise_category_count_after, exercise_category_count_before + 1)
-    #     self.assertIn('Fitbit', ExerciseCategory.objects.all())
+    @patch('wger.core.views.user.fitbit_get_data')
+    def test_sync_fitbit_activity(self, mock_fitbit_data):
+        exercise_count_before = Exercise.objects.count()
+        exercise_category_count_before = ExerciseCategory.objects.count()
+        activity = {"categories": [{"activities": [{"name": "Aerobic step"}], "name": "Dancing"}]}
+
+        mock_fitbit_data.return_value = activity
+        self.client.post(reverse('core:user:login'),
+                         data={'username': self.username, 'password': self.password})
+        response = self.client.get(reverse('core:user:fitbit-activity'),
+                                   data=self.code, follow=True)
+        self.assertRedirects(response, reverse('exercise:exercise:overview'))
+        self.assertContains(response, 'Successfully synced exercise data.')
+        exercise_count_after = Exercise.objects.count()
+        exercise_category_count_after = ExerciseCategory.objects.count()
+        self.assertEqual(exercise_count_after, exercise_count_before + 1)
+        self.assertEqual(exercise_category_count_after, exercise_category_count_before + 1)
+        category_obj = ExerciseCategory.objects.all()
+        category_names = [n.name for n in category_obj]
+        self.assertIn('Fitbit', category_names)
+
+    @patch('wger.core.views.user.fitbit_get_data')
+    def test_sync_fitbit_ingredients_with_empty_response(self, mock_fitbit_data):
+        data = {"foods": [{"loggedFood": {}, "nutritionalValues": {}}]}
+
+        mock_fitbit_data.return_value = data
+        self.client.post(reverse('core:user:login'),
+                         data={'username': self.username, 'password': self.password})
+        response = self.client.get(reverse('core:user:fitbit-ingredients'),
+                                   data=self.code, follow=True)
+
+        self.assertContains(response, 'Sorry no food logs on Fitbit today')
+        self.assertRedirects(response, reverse('nutrition:ingredient:list'))
+
+    @patch('wger.core.views.user.fitbit_get_data')
+    def test_sync_fitbit_activity_with_empty_response(self, mock_fitbit_data):
+        activity = {"categories": [{"activities": []}]}
+        mock_fitbit_data.return_value = activity
+        self.client.post(reverse('core:user:login'),
+                         data={'username': self.username, 'password': self.password})
+        response = self.client.get(reverse('core:user:fitbit-activity'),
+                                   data=self.code, follow=True)
+        self.assertContains(response, 'Sorry no activity logged on Fitbit today')
+        self.assertRedirects(response, reverse('exercise:exercise:overview'))
+
