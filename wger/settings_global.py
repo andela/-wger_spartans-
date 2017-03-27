@@ -371,5 +371,4 @@ WGER_SETTINGS = {
     'TWITTER': False,
     'FITBIT_CLIENT_ID': os.environ.get('FITBIT_CLIENT_ID'),
     'FITBIT_CLIENT_SECRET': os.environ.get('FITBIT_CLIENT_SECRET'),
-    'FITBIT_CALLBACK_URL': os.environ.get('FITBIT_CALLBACK_URL')
 }
