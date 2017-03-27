@@ -16,50 +16,46 @@
 # along with Workout Manager.  If not, see <http://www.gnu.org/licenses/>.
 import re
 
-from django.db import IntegrityError
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
+from django.db import IntegrityError
+from django.utils import translation
+from rest_framework import serializers
+from rest_framework import status
 from rest_framework import viewsets
-from rest_framework.response import Response
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication, \
+    TokenAuthentication
 from rest_framework.decorators import detail_route
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-
-from wger.core.models import (
-    UserProfile,
-    Language,
-    DaysOfWeek,
-    License,
-    RepetitionUnit,
-    WeightUnit)
 from wger.core.api.serializers import (
-    UsernameSerializer,
-    UserRegistrationSerializer,
-    LanguageSerializer,
     DaysOfWeekSerializer,
+    LanguageSerializer,
     LicenseSerializer,
+    UserprofileSerializer,
+    UserSerializer,
+    UsernameSerializer,
     RepetitionUnitSerializer,
     WeightUnitSerializer
 )
-from wger.core.api.serializers import UserprofileSerializer
-from wger.core.models import Language
-from rest_framework import status
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication, \
-    TokenAuthentication
-from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
-from django.utils import translation
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from django.contrib.auth.hashers import make_password
-from rest_framework import serializers
+from wger.core.models import (
+    DaysOfWeek,
+    Language,
+    License,
+    RepetitionUnit,
+    UserProfile,
+    WeightUnit)
 from wger.config.models import GymConfig
-from wger.gym.models import Gym
-from wger.gym.models import GymUserConfig
+from wger.gym.models import Gym, GymUserConfig
+from wger.utils.permissions import UpdateOnlyPermission, WgerPermission
 
 
 class RegisterUserViewSet(viewsets.ModelViewSet):
     """
     API endpoint that allows login and registration of users
     """
-    serializer_class = UserRegistrationSerializer
+    serializer_class = UserSerializer
     http_method_names = ['post']
     authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
@@ -106,7 +102,7 @@ class RegisterUserViewSet(viewsets.ModelViewSet):
 
         user.userprofile.save()
 
-        serializer = UserRegistrationSerializer(user)
+        serializer = UserSerializer(user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
