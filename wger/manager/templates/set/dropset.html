@@ -1,37 +1,37 @@
-{ % extends extend_template % }
-{ % load i18n % }
-{ % load staticfiles % }
-{ % load wger_extras % }
+{% extends extend_template %}
+{% load i18n %}
+{% load staticfiles %}
+{% load wger_extras %}
 
 
 <!--
         Title
 -->
 
-{ % block title % }{ % with day_name = day.description % }{ % blocktrans % }Add exercises to day "{{day_name}}"{ % endblocktrans % }{ % endwith % }{ % endblock % }
+{% block title %}{% with day_name=day.description %}{% blocktrans %}Add drop set exercises to day "{{day_name}}"{% endblocktrans %}{% endwith %}{% endblock %}
 
 
 <!--
         Header
 -->
-{ % block header % }
-<script >
+{% block header %}
+<script>
 function wgerCustomPageInit()
 {
-    wgerInitEditSet();}
-< / script >
-{ % endblock % }
+    wgerInitEditSet();
+}
+</script>
+{% endblock %}
 
 <!--
         Main Content
 -->
-{ % block content % }
+{% block content %}
 
 
-<form action = "{{form_action}}"
-      method = "post"
-
-      class = "form-horizontal" >
+<form action="{{form_action}}"
+      method="post"
+      class="form-horizontal">
 
     {% csrf_token %}
     {% render_form_field form.exercises %}
