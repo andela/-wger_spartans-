@@ -24,7 +24,7 @@ from wger.core.tests.base_testcase import (
     WorkoutManagerEditTestCase,
     WorkoutManagerAccessTestCase
 )
-from wger.core.views.user import fitbit_authorization
+from wger.core.views.user import fitbit_authorization, fitbit_get_data
 from wger.exercises.models import (
     Exercise,
     ExerciseCategory,
@@ -244,6 +244,9 @@ class UserFitbitSyncTestCase(WorkoutManagerTestCase):
         self.username = 'test'
         self.password = 'testtest'
         self.code = {'code': '80b5a817c2b1d8fb2081db8d31d870446828017'}
+        self.call_back_weight = settings.SITE_URL + reverse('core:user:fitbit')
+        self.call_back_exercise = settings.SITE_URL + reverse('core:user:fitbit-activity')
+        self.call_back_ingredients = settings.SITE_URL + reverse('core:user:fitbit-ingredients')
         os.environ['RECAPTCHA_TESTING'] = 'True'
 
     def tearDown(self):
@@ -347,8 +350,7 @@ class UserFitbitSyncTestCase(WorkoutManagerTestCase):
                                           'TWITTER': False
                                           }):
             with self.settings(SITE_URL='http://localhost:8000'):
-                call_back = settings.SITE_URL + reverse('core:user:fitbit')
-                template = fitbit_authorization(call_back)
+                template = fitbit_authorization(self.call_back_weight)
                 expected_response = 'https://www.fitbit.com/oauth2/authorize?response_type=code&' \
                                     'client_id=fake-client-id&redirect_uri=http%3A%2F%2F' \
                                     'localhost%3A8000%2Fen%2Fuser%2Ffitbit_sync_weight&scope=' \
@@ -356,3 +358,46 @@ class UserFitbitSyncTestCase(WorkoutManagerTestCase):
                                     'settings+sleep+social+weight'
                 self.assertIn(expected_response, template['fitbit_url'])
                 self.assertIn('prompt=login', template['fitbit_url'])
+
+    @patch('fitbit.Fitbit._COLLECTION_RESOURCE')
+    @patch('fitbit.Fitbit.activities_list')
+    @patch('fitbit.Fitbit.user_profile_get')
+    @patch('fitbit.FitbitOauth2Client.fetch_access_token')
+    def test_sync_fitbit_get_data(self, mock_fetch_access_token, mock_user_profile_get,
+                                  mock_activities_list, mock_COLLECTION_RESOURCE):
+        token = {'access_token': '215516887', 'refresh_token': '215516887215516887'}
+        mock_fetch_access_token.return_value = token
+        user_data = {"user": {"weight": 68}}
+        mock_user_profile_get.return_value = user_data
+        activity = {"categories": [{"activities": [{"name": "Aerobic step"}], "name": "Dancing"}]}
+        mock_activities_list.return_value = activity
+        food_data = {"foods": [{"loggedFood": {"name": "Croissant"}, "nutritionalValues": {
+            "calories": 293, "carbs": 30.86, "fat": 15.96, "fiber": 0.96, "protein": 5.19,
+            "sodium": 235}}]}
+        mock_COLLECTION_RESOURCE.return_value = food_data
+        with self.settings(WGER_SETTINGS={'FITBIT_CLIENT_ID': 'fake-client-id',
+                                          'FITBIT_CLIENT_SECRET': 'fake-client-secret',
+                                          'USE_RECAPTCHA': False,
+                                          'REMOVE_WHITESPACE': False,
+                                          'ALLOW_REGISTRATION': True,
+                                          'ALLOW_GUEST_USERS': True,
+                                          'EMAIL_FROM': 'wger Workout Manager <wger@example.com>',
+                                          'TWITTER': False
+                                          }):
+            with self.settings(SITE_URL='http://localhost:8000'):
+                fitbit_get_data(self.code, self.call_back_weight, action='weight')
+                mock_fetch_access_token.assert_called_once_with(self.code,
+                                                                redirect_uri=self.call_back_weight)
+                mock_user_profile_get.assert_called()
+                mock_activities_list.assert_not_called()
+                mock_COLLECTION_RESOURCE.assert_not_called()
+
+                fitbit_get_data(self.code, self.call_back_exercise, action='exercise')
+                mock_fetch_access_token.assert_called_with(self.code,
+                                                           redirect_uri=self.call_back_exercise)
+                mock_activities_list.assert_called()
+                mock_COLLECTION_RESOURCE.assert_not_called()
+                fitbit_get_data(self.code, self.call_back_ingredients, action='food_log')
+                mock_fetch_access_token.assert_called_with(self.code,
+                                                           redirect_uri=self.call_back_ingredients)
+                mock_COLLECTION_RESOURCE.assert_called_with('foods/log')
