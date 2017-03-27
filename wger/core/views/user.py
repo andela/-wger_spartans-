@@ -511,7 +511,7 @@ def sync_fitbit_weight(request):
         """  fitbit integration to retrieve weight """
 
         call_back = settings.SITE_URL + reverse('core:user:fitbit')
-        template = fitbit_authorization(request, call_back)
+        template = fitbit_authorization(call_back)
 
         # import pdb; pdb.set_trace()
 
@@ -554,7 +554,7 @@ def sync_fitbit_activity(request):
     """  fitbit integration to retrieve frequent activities """
 
     call_back = settings.SITE_URL + reverse('core:user:fitbit-activity')
-    template = fitbit_authorization(request, call_back)
+    template = fitbit_authorization(call_back)
     if "code" in request.GET:
         token_code = request.GET["code"]
         response = fitbit_get_data(token_code, call_back, action='exercise')
@@ -588,12 +588,9 @@ def sync_fitbit_activity(request):
                     else:
                         exercise.language = Language.objects.get(short_name='en')
                     if not License.objects.filter(short_name='Apache').exists():
-                        licence = License(short_name="Apache",
-                                                   full_name='Apache License '
-                                                             'Version'
-                                                             '2.0,January 2004',
-                                                   url='http://www.apache.org/'
-                                                       'licenses/LICENSE-2.0')
+                        licence = License(short_name="Apache", full_name='Apache License Version'
+                                                                         '2.0,January 2004',
+                                          url='http://www.apache.org/licenses/LICENSE-2.0')
                         licence.save()
                     exercise.license = License.objects.get(short_name='Apache')
                     exercise.category = ExerciseCategory.objects.get(
@@ -621,7 +618,7 @@ def sync_fitbit_ingredients(request):
     """  fitbit integration to retrieve frequent activities """
 
     call_back = settings.SITE_URL + reverse('core:user:fitbit-ingredients')
-    template = fitbit_authorization(request, call_back)
+    template = fitbit_authorization(call_back)
     if "code" in request.GET:
         token_code = request.GET["code"]
         food_collection = fitbit_get_data(token_code, call_back, action='food_log')
@@ -674,8 +671,7 @@ def sync_fitbit_ingredients(request):
     return render(request, 'user/fitbit_ingredients.html', template)
 
 
-@login_required
-def fitbit_authorization(request, callback):
+def fitbit_authorization(callback):
     code = None
     client_id = settings.WGER_SETTINGS['FITBIT_CLIENT_ID']
     client_secret = settings.WGER_SETTINGS['FITBIT_CLIENT_SECRET']
@@ -693,18 +689,23 @@ def fitbit_get_data(code, callback, action=None):
         client_secret = settings.WGER_SETTINGS['FITBIT_CLIENT_SECRET']
         fitbit_client = FitbitOauth2Client(client_id, client_secret)
         call_back = callback
-        token = fitbit_client.fetch_access_token(code, redirect_uri=call_back)
-        # import pdb; pdb.set_trace()
-        if "access_token" in token:
-            fitbit_request = Fitbit(client_id=client_id, client_secret=client_secret,
-                                    access_token=token["access_token"],
-                                    refresh_token=token["refresh_token"], system="en_UK")
-            if action == 'weight':
-                return fitbit_request.user_profile_get()
-            elif action == 'exercise':
-                return fitbit_request.activities_list()
-            elif action == 'food_log':
-                return fitbit_request._COLLECTION_RESOURCE('foods/log')
+        if call_back == 'authorization_url':
+            url = fitbit_client.authorize_token_url(redirect_uri=call_back, prompt='login')
+
+            template = {"fitbit_url": url[0]}
+            return template
+        else:
+            token = fitbit_client.fetch_access_token(code, redirect_uri=call_back)
+            if "access_token" in token:
+                fitbit_request = Fitbit(client_id=client_id, client_secret=client_secret,
+                                        access_token=token["access_token"],
+                                        refresh_token=token["refresh_token"], system="en_UK")
+                if action == 'weight':
+                    return fitbit_request.user_profile_get()
+                elif action == 'exercise':
+                    return fitbit_request.activities_list()
+                elif action == 'food_log':
+                    return fitbit_request._COLLECTION_RESOURCE('foods/log')
     except BaseException as e:
         return str(e)
 
