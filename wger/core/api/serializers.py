@@ -28,9 +28,9 @@ from wger.core.models import (
     WeightUnit)
 
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
+class UserSerializer(serializers.ModelSerializer):
     """
-    User registration serializer
+    User serializer
     """
     class Meta:
         model = User
