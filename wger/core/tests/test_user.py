@@ -12,27 +12,25 @@
 #
 # You should have received a copy of the GNU Affero General Public License
 
+import os
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse, reverse_lazy
+from mock import patch
 
 from wger.core.tests.base_testcase import (
     WorkoutManagerTestCase,
     WorkoutManagerEditTestCase,
     WorkoutManagerAccessTestCase
 )
-from mock import patch
-import os
-from wger.weight.models import WeightEntry
-from django.contrib.auth.models import User
-import datetime
-from django.db import IntegrityError
-from django.db import transaction
-import json
-from wger.nutrition.models import Ingredient
+from wger.core.views.user import fitbit_authorization
 from wger.exercises.models import (
     Exercise,
     ExerciseCategory,
 )
+from wger.nutrition.models import Ingredient
+from wger.weight.models import WeightEntry
 
 
 class StatusUserTestCase(WorkoutManagerTestCase):
@@ -338,3 +336,23 @@ class UserFitbitSyncTestCase(WorkoutManagerTestCase):
         self.assertContains(response, 'Sorry no activity logged on Fitbit today')
         self.assertRedirects(response, reverse('exercise:exercise:overview'))
 
+    def test_fitbit_authorization(self):
+        with self.settings(WGER_SETTINGS={'FITBIT_CLIENT_ID': 'fake-client-id',
+                                          'FITBIT_CLIENT_SECRET': 'fake-client-secret',
+                                          'USE_RECAPTCHA': False,
+                                          'REMOVE_WHITESPACE': False,
+                                          'ALLOW_REGISTRATION': True,
+                                          'ALLOW_GUEST_USERS': True,
+                                          'EMAIL_FROM': 'wger Workout Manager <wger@example.com>',
+                                          'TWITTER': False
+                                          }):
+            with self.settings(SITE_URL='http://localhost:8000'):
+                call_back = settings.SITE_URL + reverse('core:user:fitbit')
+                template = fitbit_authorization(call_back)
+                expected_response = 'https://www.fitbit.com/oauth2/authorize?response_type=code&' \
+                                    'client_id=fake-client-id&redirect_uri=http%3A%2F%2F' \
+                                    'localhost%3A8000%2Fen%2Fuser%2Ffitbit_sync_weight&scope=' \
+                                    'activity+nutrition+heartrate+location+nutrition+profile+' \
+                                    'settings+sleep+social+weight'
+                self.assertIn(expected_response, template['fitbit_url'])
+                self.assertIn('prompt=login', template['fitbit_url'])
