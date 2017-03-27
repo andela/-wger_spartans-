@@ -689,23 +689,17 @@ def fitbit_get_data(code, callback, action=None):
         client_secret = settings.WGER_SETTINGS['FITBIT_CLIENT_SECRET']
         fitbit_client = FitbitOauth2Client(client_id, client_secret)
         call_back = callback
-        if call_back == 'authorization_url':
-            url = fitbit_client.authorize_token_url(redirect_uri=call_back, prompt='login')
-
-            template = {"fitbit_url": url[0]}
-            return template
-        else:
-            token = fitbit_client.fetch_access_token(code, redirect_uri=call_back)
-            if "access_token" in token:
-                fitbit_request = Fitbit(client_id=client_id, client_secret=client_secret,
-                                        access_token=token["access_token"],
-                                        refresh_token=token["refresh_token"], system="en_UK")
-                if action == 'weight':
-                    return fitbit_request.user_profile_get()
-                elif action == 'exercise':
-                    return fitbit_request.activities_list()
-                elif action == 'food_log':
-                    return fitbit_request._COLLECTION_RESOURCE('foods/log')
+        token = fitbit_client.fetch_access_token(code, redirect_uri=call_back)
+        if "access_token" in token:
+            fitbit_request = Fitbit(client_id=client_id, client_secret=client_secret,
+                                    access_token=token["access_token"],
+                                    refresh_token=token["refresh_token"], system="en_UK")
+            if action == 'weight':
+                return fitbit_request.user_profile_get()
+            elif action == 'exercise':
+                return fitbit_request.activities_list()
+            elif action == 'food_log':
+                return fitbit_request._COLLECTION_RESOURCE('foods/log')
     except BaseException as e:
         return str(e)
 
