@@ -295,6 +295,24 @@ class UserFitbitSyncTestCase(WorkoutManagerTestCase):
         self.assertEqual(ingredient_count_after, ingredient_count_before + 1)
 
     @patch('wger.core.views.user.fitbit_get_data')
+    def test_sync_fitbit_ingredients_with_empty_calories(self, mock_fitbit_data):
+        ingredient_count_before = Ingredient.objects.count()
+        data = {"foods": [{"loggedFood": {"name": "Croissant"},
+                           "nutritionalValues": {}}]}
+        mock_fitbit_data.return_value = data
+        self.client.post(reverse('core:user:login'),
+                         data={'username': self.username, 'password': self.password})
+        response = self.client.get(reverse('core:user:fitbit-ingredients'),
+                                   data=self.code, follow=True)
+
+        self.assertContains(response, 'Successfully synced your Food Log')
+        self.assertRedirects(response, reverse('nutrition:ingredient:list'))
+        ingredient_count_after = Ingredient.objects.count()
+        self.assertEqual(ingredient_count_after, ingredient_count_before + 1)
+        croissant_ingredients = Ingredient.objects.get(name='Croissant').sodium
+        self.assertEqual(croissant_ingredients, 0)
+
+    @patch('wger.core.views.user.fitbit_get_data')
     def test_sync_fitbit_activity(self, mock_fitbit_data):
         exercise_count_before = Exercise.objects.count()
         exercise_category_count_before = ExerciseCategory.objects.count()
