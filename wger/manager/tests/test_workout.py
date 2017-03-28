@@ -20,7 +20,7 @@ from wger.core.tests import api_base_test
 from wger.core.tests.base_testcase import WorkoutManagerDeleteTestCase
 from wger.core.tests.base_testcase import WorkoutManagerEditTestCase
 from wger.core.tests.base_testcase import WorkoutManagerTestCase
-from wger.manager.models import Workout
+from wger.manager.models import Workout, Exercise
 
 
 class WorkoutShareButtonTestCase(WorkoutManagerTestCase):

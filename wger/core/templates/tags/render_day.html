@@ -1,6 +1,6 @@
-{% load i18n staticfiles wger_extras thumbnail %}
+{% load i18n staticfiles wger_extras thumbnail % }
 
-<script>
+<script >
 $(document).ready(function() {
 
     // Call the setup function to allow the sets to be sortable again after loading this
@@ -8,50 +8,50 @@ $(document).ready(function() {
     wgerSetupSortable();
 
     // Init the modal dialog to edit the exercise
-    wgerFormModalDialog();
+    wgerFormModalDialog();})
+< / script >
 
-})
-</script>
+<table class = "table table-bordered workout-table" id = "table-day-{{ day.obj.id }}" data - id = "{{ day.obj.id }}" >
+<thead >
+    <tr id = "day-{{ day.obj.id }}" >
+        <th colspan = "2" style = "background: none repeat scroll 0% 0% #F5F5F5;" >
 
-<table class="table table-bordered workout-table" id="table-day-{{ day.obj.id }}" data-id="{{ day.obj.id }}">
-<thead>
-    <tr id="day-{{ day.obj.id }}">
-        <th colspan="2" style="background: none repeat scroll 0% 0% #F5F5F5;">
+            {{day.days_of_week.text}} – {{day.obj.description}}
+            {% if editable % }
+            <span class = "editoptions" style = "float: right;" >
+                <a href = "{% url 'manager:day:delete' day.obj.id %}"
+                   title = "{% trans 'Delete' %}" >
+                    <span class = "{% fa_class 'trash' %}" > < / span > < / a >
+                <a href = "{% url 'manager:day:edit' day.obj.id %}"
+                   title = "{% trans 'Edit' %}"
 
-            {{ day.days_of_week.text }} – {{ day.obj.description }}
-            {% if editable %}
-            <span class="editoptions" style="float: right;">
-                <a href="{% url 'manager:day:delete' day.obj.id %}"
-                   title="{% trans 'Delete' %}">
-                    <span class="{% fa_class 'trash' %}"></span></a>
-                <a href="{% url 'manager:day:edit' day.obj.id %}"
-                   title="{% trans 'Edit' %}"
-                   class="wger-modal-dialog">
-                    <span class="{% fa_class 'pencil-square-o' %}"></span></a>
-                <a href="{% url 'manager:day:log' day.obj.id %}"
-                   title="{% trans 'Add weight log to this day' %}">
-                    <span class="{% fa_class 'line-chart' %}"></span></a>
-            </span>
-            {% endif %}
-        </th>
-    </tr>
-    </thead>
-    <tbody>
-        {% for set in day.set_list %}
-        <tr data-id="{{ set.obj.id }}" id="set-{{ set.obj.id }}">
-            <td style="width: 15%;border-right-width: 0px;">
-                <h5><strong>{{ forloop.counter }}</strong></h5>
+                   class = "wger-modal-dialog" >
+                    <span class = "{% fa_class 'pencil-square-o' %}" > < / span > < / a >
+                <a href = "{% url 'manager:day:log' day.obj.id %}"
+                   title = "{% trans 'Add weight log to this day' %}" >
+                    <span class = "{% fa_class 'line-chart' %}" > < / span > < / a >
+            < / span >
+            {% endif % }
+        < / th >
+    < / tr >
+    < / thead >
+    <tbody >
+        {% for set in day.set_list % }
+        <tr data - id = "{{ set.obj.id }}" id = "set-{{ set.obj.id }}" >
+            <td style = "width: 15%;border-right-width: 0px;" >
+                <h5 > <strong > {{forloop.counter}} < /strong > < / h5 >
 
-                {% if editable %}
-                    <span class="editoptions">
-                    {% if day.set_list|length > 1 %}
-                        <span class="{% fa_class 'bars' %} dragndrop-handle"></span>
-                        <br>
-                    {% endif %}
-                    <a href="{% url 'manager:set:edit' set.obj.id %}"
-                       title="{% trans 'Edit' %}"
-                       class="wger-modal-dialog">
-                           <span class="{% fa_class 'pencil-square-o' %}"></span></a>
+                {% if editable % }
+                    <span class = "editoptions" >
+                    {% if day.set_list|length > 1 % }
+                        <span class = "{% fa_class 'bars' %} dragndrop-handle" > < / span >
+                        <br >
+                    {% endif % }
+                    <a href = "{% url 'manager:set:edit' set.obj.id %}"
+                       title = "{% trans 'Edit' %}"
+
+                       class = "wger-modal-dialog" >
+                           <span class = "{% fa_class 'pencil-square-o' %}" > < / span > < / a >
                         <br>
                     <a href="{% url 'manager:set:delete' set.obj.id %}"
                        title="{% trans 'Delete' %}">
@@ -135,7 +135,12 @@ $(document).ready(function() {
             <td colspan="2">
                 <a href="{% url 'manager:set:add' day.obj.id %}"
                    class="wger-modal-dialog">{% trans "Add exercises to this workout day" %}</a>
+                |
+                <a href="{% url 'manager:set:dropset' day.obj.id %}"
+                   class="wger-modal-dialog">{% trans "Add dropset exercises" %}</a>
+               
             </td>
+
         </tr>
         {% endif %}
     </tbody>

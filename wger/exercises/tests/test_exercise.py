@@ -17,6 +17,7 @@ import json
 from django.core import mail
 from django.core.cache import cache
 from django.core.urlresolvers import reverse
+from wger.core.tests.api_base_test import ApiBaseTestCase, ApiGetTestCase
 
 from wger.core.tests.base_testcase import (
     STATUS_CODES_FAIL,
