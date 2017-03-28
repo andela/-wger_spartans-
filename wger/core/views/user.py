@@ -583,10 +583,9 @@ def sync_fitbit_activity(request):
                     exercise.name_original = name
                     exercise.description = name_original
                     if not Language.objects.filter(short_name='en').exists():
-                        exercise.language = Language(short_name='en',
-                                                     full_name='English')
-                    else:
-                        exercise.language = Language.objects.get(short_name='en')
+                        language = Language(short_name='en', full_name='English')
+                        language.save()
+                    exercise.language = Language.objects.get(short_name='en')
                     if not License.objects.filter(short_name='Apache').exists():
                         licence = License(short_name="Apache", full_name='Apache License Version'
                                                                          '2.0,January 2004',
@@ -653,11 +652,9 @@ def sync_fitbit_ingredients(request):
                     new_ingredient.sodium = sodium
                     new_ingredient.energy = calories
                     if not Language.objects.filter(short_name='en').exists():
-                        new_ingredient.language = Language(short_name='en',
-                                                           full_name='English')
-                    else:
-                        new_ingredient.language = Language.objects.get(short_name='en')
-
+                        language = Language(short_name='en', full_name='English')
+                        language.save()
+                    new_ingredient.language = Language.objects.get(short_name='en')
                     new_ingredient.save()
                     messages.success(request, _('Successfully synced your Food Logs'))
                     return HttpResponseRedirect(
