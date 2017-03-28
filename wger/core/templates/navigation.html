@@ -58,6 +58,10 @@
                                 {% if user.is_authenticated and not user.userprofile.is_temporary and not trainer_identity %}
                                 <li class="divider"></li>
                                 <li><a href="{% url 'exercise:exercise:add' %}">{% trans "Add new exercise" %}</a><li>
+                                    <li>
+                                        <a href="{% url 'core:user:fitbit-activity' %}">
+                                            {% trans "Fitbit Sync Activity" %}</a>
+                                   </li>
                                 {% endif %}
 
                                 {% if perms.exercises %}
@@ -85,6 +89,10 @@
                             <ul class="dropdown-menu">
                                 <li><a href="{% url 'weight:overview' user.username %}" rel="nofollow">{% trans "Weight overview" %}</a></li>
                                 <li><a href="{% url 'weight:add' %}" rel="nofollow">{% trans "Add weight entry" %}</a></li>
+                                <li>
+                                        <a href="{% url 'core:user:fitbit' %}">
+                                            {% trans "Fitbit Sync Weight" %}</a>
+                                   </li>
                             </ul>
                         </li>
                         {% endif %}
@@ -104,6 +112,10 @@
                             <li><a href="{% url 'nutrition:ingredient:list' %}">{% trans "Ingredient overview" %}</a></li>
                             <li><a href="{% url 'nutrition:bmi:view' %}" rel="nofollow">{% trans "BMI calculator" %}</a></li>
                             <li><a href="{% url 'nutrition:calories:view' %}" rel="nofollow">{% trans "Daily calories calculator" %}</a></li>
+                             <li>
+                                        <a href="{% url 'core:user:fitbit-ingredients' %}">
+                                            {% trans "Fitbit Sync Ingredients" %}</a>
+                                   </li>
                             {% if perms.nutrition %}
                                 <li class="divider"></li>
                                 <li class="dropdown-header">{% trans "Administration" %}</li>
@@ -200,6 +212,8 @@
                                     <li>
                                         <a href="{% url 'core:user:preferences' %}">{% trans "My preferences" %}</a>
                                     </li>
+
+
                                     {% if not trainer_identity %}
                                     <li class="divider"></li>
                                     <li>

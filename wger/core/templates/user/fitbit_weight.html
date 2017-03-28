@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+ {% load i18n staticfiles wger_extras %}
+
+ {% block title %}{% trans "FitBit Activities Sync" %}{% endblock %}
+
+ {% block content %}
+ <p> {% trans "Click the button below to sync with FitBit Api and retrieve your activity details" %}
+ </p>
+ <a href="{{fitbit_url}}" class="btn btn-default">{% trans "Sync FitBit" %}</a>
+ {% endblock %}
